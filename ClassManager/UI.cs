@@ -382,24 +382,25 @@ namespace Sebastien.ClassManager.Core
         {
             WriteLine("你想创建哪一科目的任课教师? (选择: 上/下方向键   确定: 回车键) ");
             Subject result = new Selector<Subject>(
-                new List<String>()
-                {
-                    "C语言任课老师",
-                    "C++任课老师",
-                    "C#任课老师",
-                    "HTML/Css任课老师",
-                    "Java任课老师",
-                    "SQL数据库任课老师"
-                },
-                new Subject[]
-                {
-                    Subject.C,
-                    Subject.CPlusPlus,
-                    Subject.CSharp,
-                    Subject.HtmlAndCss,
-                    Subject.Java,
-                    Subject.SQL
-                }).GetSubject();
+                                          new List<String>()
+                                           {
+                                                "C语言任课老师",
+                                                "C++任课老师",
+                                                "C#任课老师",
+                                                "HTML/Css任课老师",
+                                                "Java任课老师",
+                                                "SQL数据库任课老师"
+                                           },
+                                          new Subject[]
+                                          {
+                                                 Subject.C,
+                                                 Subject.CPlusPlus,
+                                                 Subject.CSharp,
+                                                 Subject.HtmlAndCss,
+                                                 Subject.Java,
+                                                 Subject.SQL
+                                           }
+                                       ).GetSubject();
             try
             {
                 Write("账号: ");

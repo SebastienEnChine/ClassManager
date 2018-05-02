@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sebastien.ClassManager.Core;
 using Sebastien.ClassManager.Enums;
 
-namespace StudentManagerStudioTestProject
+namespace Sebastien.ClassManager.TestProject
 {
     [TestClass]
     public class ClentTest

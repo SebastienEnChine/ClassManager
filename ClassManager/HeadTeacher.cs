@@ -3,6 +3,7 @@ using static System.Console;
 using System.Collections.Generic;
 using System.Linq;
 using Sebastien.ClassManager.Enums;
+using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -94,24 +95,26 @@ namespace Sebastien.ClassManager.Core
         /// <param name="cc">新课表</param>
         public void AddNewCurriculum(Curriculum cc)
         {
-            Client.UpdateCurriculum();
             if (!Client.CanAddNewCurriculum())
             {
                 UI.DisplayTheInformationOfErrorCode(ErrorCode.CantAdd);
                 return;
             }
-            else if (InformationLibrary._curriculums[0] == null)
+            new Thread(() =>
             {
-                InformationLibrary._curriculums[0] = cc;
-            }
-            else
-            {
-                InformationLibrary._curriculums[1] = cc;
-            }
-            var msg = new Message("班主任", "发布了新课表, 快去看看吧~");
-            ReleaseNewMsg(msg);
-            InformationLibrary.HeadTeacherUser.AddHistory(msg);
-            UI.DisplayTheInformationOfSuccessfully();
+               if (InformationLibrary._curriculums[0] == null)
+               {
+                   InformationLibrary._curriculums[0] = cc;
+               }
+               else
+               {
+                   InformationLibrary._curriculums[1] = cc;
+               }
+               var msg = new Message("班主任", "发布了新课表, 快去看看吧~");
+               ReleaseNewMsg(msg);
+               InformationLibrary.HeadTeacherUser.AddHistory(msg);
+               UI.DisplayTheInformationOfSuccessfully();
+           }).Start();
         }
         /// <summary>
         /// 重写查看班主任信息方法

@@ -1,7 +1,7 @@
 ﻿using System;
 using static System.Console;
 using Sebastien.ClassManager.Enums;
-
+using System.Threading;
 #region 其他需求
 //其他: 
 //          2: 切换用户之后 窗口标题显示对应用户类型
@@ -187,12 +187,16 @@ namespace Sebastien.ClassManager.Core
                     stu.DisplayTeacherList();
                     break;
                 case Command.SubscriptionToHeadTeacher:
-                    stu.SubscriptionToHeadTeacher(InformationLibrary.HeadTeacherUser);
-                    UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
+                    if (stu.SubscriptionToHeadTeacher(InformationLibrary.HeadTeacherUser))
+                    {
+                        UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
+                    }
                     break;
                 case Command.UnsubscribeToHeadTeacher:
-                    stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser);
-                    UI.DisplayTheInformationOfSuccessfully("(取消订阅成功)");
+                    if (stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser))
+                    {
+                        UI.DisplayTheInformationOfSuccessfully("(取消订阅成功)");
+                    }
                     break;
                 default:
                     UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);

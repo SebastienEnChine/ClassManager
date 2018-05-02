@@ -1,4 +1,15 @@
 ﻿using MySelector;
-using Microsoft.VisualStudio.TestTools;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace 
+namespace Sebastien.Selector.TestProject
+{
+    [TestClass]
+    public class SelectTest
+    {
+        [TestMethod]
+        public void TestMethod()
+        {
+
+        }
+    }
+}

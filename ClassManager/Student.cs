@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using Sebastien.ClassManager.Enums;
 using System.Collections;
+using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -107,32 +108,38 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 订阅
         /// </summary>
-        public void SubscriptionToHeadTeacher(Teacher teacher)
+        public bool SubscriptionToHeadTeacher(Teacher teacher)
         {
             if (IsSubscription)
             {
                 UI.DisplayTheInformationOfErrorCode(ErrorCode.DuplicateSubscriptions);
+                return false;
             }
             else
             {
-                teacher.NewMsg += ReceiveNewCurriculum;
-
-                IsSubscription = true;
+                new Thread(() =>
+                {
+                    teacher.NewMsg += ReceiveNewCurriculum;
+                    IsSubscription = true;
+                }).Start();
             }
+            return true;
         }
         /// <summary>
         /// 取消订阅
         /// </summary>
-        public void UnsubscribeToHeadTeacher(Teacher teacher)
+        public bool UnsubscribeToHeadTeacher(Teacher teacher)
         {
-            if (IsSubscription)
+            if (! IsSubscription)
             {
-                teacher.NewMsg -= ReceiveNewCurriculum;
+                UI.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
+                return false;
             }
             else
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
+                new Thread(() => teacher.NewMsg -= ReceiveNewCurriculum).Start();
             }
+            return true;
         }
         /// <summary>
         /// 实现IComparable接口

@@ -1,7 +1,7 @@
 ﻿using System;
 using static System.Console;
 using Sebastien.ClassManager.Enums;
-using System.Threading;
+
 #region 其他需求
 //其他: 
 //          2: 切换用户之后 窗口标题显示对应用户类型

@@ -1,6 +1,6 @@
 ﻿using System;
-using static System.Console;
 using System.Linq;
+using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 

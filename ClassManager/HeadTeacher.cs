@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using static System.Console;
 using System.Collections.Generic;
-using System.Linq;
 using Sebastien.ClassManager.Enums;
-using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {

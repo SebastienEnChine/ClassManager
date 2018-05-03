@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Text;
+using System.Threading;
+using System.Collections;
 using static System.Console;
 using System.Collections.Generic;
-using System.Text;
 using Sebastien.ClassManager.Enums;
-using System.Collections;
-using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {

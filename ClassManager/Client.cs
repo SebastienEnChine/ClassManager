@@ -88,7 +88,7 @@ namespace Sebastien.ClassManager.Core
             switch (cmd)
             {
                 case Command.GetHelp:
-                    UI.GetHelp(currentUser.UserType);
+                    currentUser.GetHelp();
                     break;
                 case Command.SwitchUser:
                     user = IdentityCheck(UI.GetInformationForLogin());
@@ -332,7 +332,7 @@ namespace Sebastien.ClassManager.Core
                     headTeacher.DisplayScoreHighThan();
                     break;
                 case Command.ReleaseNewCurriculum:
-                    headTeacher.AddNewCurriculum(headTeacher.CreateCurriculum());
+                    headTeacher.AddNewCurriculum();
                     break;
                 case Command.ReleaseAMsg:
                     headTeacher.ReleaseNewMessage();

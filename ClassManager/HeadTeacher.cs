@@ -90,16 +90,46 @@ namespace Sebastien.ClassManager.Core
             }
         }
         /// <summary>
+        /// 创建临时课表 (由于测试需要  暂时自动随机填充课表)
+        /// </summary>
+        public static Curriculum CreateCurriculum()
+        {
+            if (!Client.CanAddNewCurriculum())
+            {
+                throw new NullReferenceException();
+            }
+            Random rd = new Random();
+            return NewCurriculum();
+
+            Curriculum NewCurriculum()
+            {
+                Curriculum temp = new Curriculum();
+                for (int line = 0; line < temp.Week; ++line)
+                {
+                    for (int row = 0; row < temp.Classes; ++row)
+                    {
+                        temp[line, row] = new CurriculumContant(line.ToString(), row.ToString(), (ConsoleColor)rd.Next(14) + 1);
+                    }
+                }
+                return temp;
+            }
+        }
+        /// <summary>
         /// 发布新课表
         /// </summary>
         /// <param name="cc">新课表</param>
-        public void AddNewCurriculum(Curriculum cc)
+        public void AddNewCurriculum()
         {
-            if (!Client.CanAddNewCurriculum())
+            Curriculum cc = null;
+            try
+            {
+                cc = CreateCurriculum();
+            }catch(NullReferenceException)
             {
                 UI.DisplayTheInformationOfErrorCode(ErrorCode.CantAdd);
                 return;
             }
+
             new Thread(() =>
             {
                if (InformationLibrary._curriculums[0] == null)
@@ -110,9 +140,8 @@ namespace Sebastien.ClassManager.Core
                {
                    InformationLibrary._curriculums[1] = cc;
                }
-               var msg = new Message("班主任", "发布了新课表, 快去看看吧~");
-               ReleaseNewMsg(msg);
-               InformationLibrary.HeadTeacherUser.AddHistory(msg);
+               ReleaseNewMsg(new Message("班主任", "发布了新课表, 快去看看吧~"));
+               InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", "发布了新课表"));
                UI.DisplayTheInformationOfSuccessfully();
            }).Start();
         }

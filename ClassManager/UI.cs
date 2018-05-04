@@ -4,6 +4,7 @@ using static System.Console;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
+using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -13,6 +14,63 @@ namespace Sebastien.ClassManager.Core
     public static class UI
     {
         #region 用户，学生，教师， 班主任类的扩展方法
+        /// <summary>
+        /// 获取帮助(指定用户)
+        /// </summary>
+        /// <param name="currentIdentity">用户类型</param>
+        public static void GetHelp(this User me)
+        {
+            switch (me.UserType)
+            {
+                case Identity.Student:
+                    GetHelpForUser();
+                    WriteLine("MyScore: 查看各科目成绩");
+                    WriteLine("ViewNews: 查看我收到的新消息");
+                    WriteLine("ViewAllNews: 查看消息记录");
+                    WriteLine("SubscriptionToHeadTeacher: 订阅班主任");
+                    WriteLine("UnsubscribeToHeadTeacher: 取消订阅班主任");
+                    break;
+                case Identity.Instructor:
+                    GetHelpForUser();
+                    WriteLine("AllSocre: 显示本班学生的本科目成绩(不排序)");
+                    WriteLine("AllSocreAndRank: 显示本班学生的本科目成绩(排序)");
+                    WriteLine("ChangeScore: 设置或修改学生的成绩");
+                    WriteLine("HighThan: 查看高于指定分数的所有学生");
+                    WriteLine("ReleaseAMsg: 广播一条消息");
+                    break;
+                case Identity.HeadTeacher:
+                    WriteLine("AddStudent: 新生注册");
+                    WriteLine("AddTeacher: 新老师注册");
+                    WriteLine("Remove: 永久删除一位学生或老师账号");
+                    WriteLine("AllSocre: 显示本班学生的成绩(不排序)");
+                    WriteLine("AllSocreAndRank: 显示本班学生的成绩(排序)");
+                    WriteLine("HighThan: 查看总分高于指定分数的所有学生");
+                    WriteLine("ChangeName: 修改姓名");
+                    WriteLine("ReleaseNewCurriculum: 发布新课表");
+                    WriteLine("ReleaseAMsg: 广播一条消息");
+                    GetHelpForUser();
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+            /// <summary>
+            /// 获取帮助
+            /// </summary>
+            void GetHelpForUser()
+            {
+                WriteLine("SwitchUser: 切换用户");
+                WriteLine("ChangePasswd: 修改密码");
+                WriteLine("ChangeAge: 修改年龄");
+                WriteLine("ChangeAddress: 修改地址");
+                WriteLine("ChangeSex: 修改性别");
+                WriteLine("ShowMe: 个人信息概览");
+                WriteLine("StudentsPreview: 学生列表预览");
+                WriteLine("TeachersPreview: 教师列表预览");
+                WriteLine("ViewCurriculums: 查看课表");
+                WriteLine("ViewMyHistory: 查看我的操作记录");
+                WriteLine("Exit: 退出程序");
+            }
+        }
         /// <summary>
         /// 显示命令提示符
         /// </summary>
@@ -93,9 +151,12 @@ namespace Sebastien.ClassManager.Core
                 }
                 else
                 {
-                    me.Passwd = secondPasswd;
-                    me.AddHistory(new Message("你", "重新设置了密码"));
-                    DisplayTheInformationOfSuccessfully();
+                    new Thread(() =>
+                    {
+                        me.Passwd = secondPasswd;
+                        me.AddHistory(new Message("你", "重新设置了密码"));
+                        DisplayTheInformationOfSuccessfully();
+                    }).Start();
                 }
             }
             catch (FormatException)
@@ -105,7 +166,7 @@ namespace Sebastien.ClassManager.Core
 
         }
         /// <summary>
-        /// 修改年龄
+        /// 修改年龄 TODO: 
         /// </summary>
         /// <param name="me">当前用户</param>
         public static void ChangeMyAge(this User me)
@@ -118,7 +179,6 @@ namespace Sebastien.ClassManager.Core
                     throw new ArgumentException();
                 }
                 me.Age = age;
-                Task.Run(() => me.Age = age);
                 me.AddHistory(new Message("你", $"重新设置了年龄({me.Age})"));
                 DisplayTheInformationOfSuccessfully();
             }
@@ -139,7 +199,7 @@ namespace Sebastien.ClassManager.Core
         {
             Write("地址: ");
             String address = ReadLine();
-            me.AddHistory(new Message("你", $"重新设置了地址({address})"));
+            new Thread(() => me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"))).Start(); 
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -150,8 +210,7 @@ namespace Sebastien.ClassManager.Core
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
             TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
-            me.Sex = result;
-            me.AddHistory(new Message("你", $"重新设置了性别({result})"));
+            new Thread(() => me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})"))).Start();
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -196,9 +255,9 @@ namespace Sebastien.ClassManager.Core
             if (stu.HasNewMsg)
             {
                 SetCursorPosition(0, CursorTop);
-                Write($"[ {DateTime.Now.ToLongTimeString()} ] {stu.UserType}@{stu.Name}");
+                PrintColorMsg($"[ {DateTime.Now.ToLongTimeString()} ] {stu.UserType}@{stu.Name}", ConsoleColor.Black, ConsoleColor.Cyan);
                 PrintColorMsg("[新消息]", ConsoleColor.Black, ConsoleColor.DarkMagenta);
-                Write(">");
+                PrintColorMsg(">", ConsoleColor.Black, ConsoleColor.Cyan);
             }
         }
 
@@ -254,8 +313,11 @@ namespace Sebastien.ClassManager.Core
         {
             Write("在此处输入将要广播的消息> ");
             Message msg = new Message("班主任", ReadLine());
-            teacher.ReleaseNewMsg(msg);
-            teacher.AddHistory(new Message("你", $"广播了一条消息: {msg.Content}"));
+            new Thread(() =>
+            {
+                teacher.ReleaseNewMsg(msg);
+                teacher.AddHistory(new Message("你", $"广播了一条消息: {msg.Content}"));
+            }).Start();
             DisplayTheInformationOfSuccessfully("(广播已发布)");
         }
 
@@ -267,8 +329,11 @@ namespace Sebastien.ClassManager.Core
         {
             Write("新姓名: ");
             String name = ReadLine();
-            InformationLibrary.HeadTeacherUser.Name = name;
-            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"重新设置了你的姓名({name})"));
+            new Thread(() =>
+            {
+                InformationLibrary.HeadTeacherUser.Name = name;
+                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"重新设置了你的姓名({name})"));
+            }).Start();
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -286,7 +351,9 @@ namespace Sebastien.ClassManager.Core
                     Write("新姓名: ");
                     String name = ReadLine();
                     InformationLibrary.StudentLibrary[index].Name = name;
-                    InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"将{InformationLibrary.StudentLibrary[index].Account}的姓名重新设置为({name})"));
+                    InformationLibrary.HeadTeacherUser.AddHistory(
+                        new Message("你", $"将{InformationLibrary.StudentLibrary[index].Account}的姓名重新设置为({name})")
+                        );
                     DisplayTheInformationOfSuccessfully();
                     return;
                 }
@@ -307,27 +374,7 @@ namespace Sebastien.ClassManager.Core
                 }
             }
         }
-        /// <summary>
-        /// 创建临时课表 (由于测试需要  暂时自动随机填充课表)
-        /// </summary>
-        public static Curriculum CreateCurriculum(this HeadTeacher ht)
-        {
-            Random rd = new Random();
-            return NewCurriculum();
-
-            Curriculum NewCurriculum()
-            {
-                Curriculum temp = new Curriculum();
-                for (int line = 0; line < temp.Week; ++line)
-                {
-                    for (int row = 0; row < temp.Classes; ++row)
-                    {
-                        temp[line, row] = new CurriculumContant(line.ToString(), row.ToString(), (ConsoleColor)rd.Next(14) + 1);
-                    }
-                }
-                return temp;
-            }
-        }
+        
         /// <summary>
         /// 添加新生
         /// </summary>
@@ -499,8 +546,11 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        InformationLibrary.StudentLibrary.RemoveAt(index);
-                        InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
+                        new Thread(() =>
+                        {
+                            InformationLibrary.StudentLibrary.RemoveAt(index);
+                            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
+                        }).Start();
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
@@ -515,8 +565,11 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
-                        InformationLibrary.TeacherLibrary.RemoveAt(index);
+                        new Thread(() =>
+                        {
+                            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
+                            InformationLibrary.TeacherLibrary.RemoveAt(index);
+                        }).Start();
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
@@ -524,7 +577,6 @@ namespace Sebastien.ClassManager.Core
             }
             DisplayTheInformationOfErrorCode(ErrorCode.CantFindThisAccount, account);
         }
-
         #endregion
 
         /// <summary>
@@ -615,64 +667,6 @@ namespace Sebastien.ClassManager.Core
         }
 
         /// <summary>
-        /// 获取帮助(指定用户)
-        /// </summary>
-        /// <param name="currentIdentity">用户类型</param>
-        public static void GetHelp(Identity currentIdentity)
-        {
-            switch (currentIdentity)
-            {
-                case Identity.Student:
-                    GetHelpForUser();
-                    WriteLine("MyScore: 查看各科目成绩");
-                    WriteLine("ViewNews: 查看我收到的新消息");
-                    WriteLine("ViewAllNews: 查看消息记录");
-                    WriteLine("SubscriptionToHeadTeacher: 订阅班主任");
-                    WriteLine("UnsubscribeToHeadTeacher: 取消订阅班主任");
-                    break;
-                case Identity.Instructor:
-                    GetHelpForUser();
-                    WriteLine("AllSocre: 显示本班学生的本科目成绩(不排序)");
-                    WriteLine("AllSocreAndRank: 显示本班学生的本科目成绩(排序)");
-                    WriteLine("ChangeScore: 设置或修改学生的成绩");
-                    WriteLine("HighThan: 查看高于指定分数的所有学生");
-                    WriteLine("ReleaseAMsg: 广播一条消息");
-                    break;
-                case Identity.HeadTeacher:
-                    WriteLine("AddStudent: 新生注册");
-                    WriteLine("AddTeacher: 新老师注册");
-                    WriteLine("Remove: 永久删除一位学生或老师账号");
-                    WriteLine("AllSocre: 显示本班学生的成绩(不排序)");
-                    WriteLine("AllSocreAndRank: 显示本班学生的成绩(排序)");
-                    WriteLine("HighThan: 查看总分高于指定分数的所有学生");
-                    WriteLine("ChangeName: 修改姓名");
-                    WriteLine("ReleaseNewCurriculum: 发布新课表");
-                    WriteLine("ReleaseAMsg: 广播一条消息");
-                    GetHelpForUser();
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
-            /// <summary>
-            /// 获取帮助
-            /// </summary>
-            void GetHelpForUser()
-            {
-                WriteLine("SwitchUser: 切换用户");
-                WriteLine("ChangePasswd: 修改密码");
-                WriteLine("ChangeAge: 修改年龄");
-                WriteLine("ChangeAddress: 修改地址");
-                WriteLine("ChangeSex: 修改性别");
-                WriteLine("ShowMe: 个人信息概览");
-                WriteLine("StudentsPreview: 学生列表预览");
-                WriteLine("TeachersPreview: 教师列表预览");
-                WriteLine("ViewCurriculums: 查看课表");
-                WriteLine("ViewMyHistory: 查看我的操作记录");
-                WriteLine("Exit: 退出程序");
-            }
-        }
-
-        /// <summary>
         /// 显示错误代码信息
         /// </summary>
         /// <param name="errorCode">错误代码</param>
@@ -735,7 +729,6 @@ namespace Sebastien.ClassManager.Core
             WriteLine(msg);
             DefaultColor();
         }
-
         /// <summary>
         /// 将字符串以指定颜色显示
         /// </summary>

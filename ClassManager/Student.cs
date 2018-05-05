@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Collections;
 using static System.Console;
 using System.Collections.Generic;
@@ -117,11 +117,11 @@ namespace Sebastien.ClassManager.Core
             }
             else
             {
-                new Thread(() =>
+                Task.Run(() =>
                 {
                     teacher.NewMsg += ReceiveNewCurriculum;
                     IsSubscription = true;
-                }).Start();
+                });
             }
             return true;
         }
@@ -137,7 +137,7 @@ namespace Sebastien.ClassManager.Core
             }
             else
             {
-                new Thread(() => teacher.NewMsg -= ReceiveNewCurriculum).Start();
+                Task.Run(() => teacher.NewMsg -= ReceiveNewCurriculum);
             }
             return true;
         }

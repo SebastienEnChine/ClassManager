@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
+using System.Threading.Tasks;
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
@@ -130,7 +130,7 @@ namespace Sebastien.ClassManager.Core
                 return;
             }
 
-            new Thread(() =>
+            Task.Run(() =>
             {
                if (InformationLibrary._curriculums[0] == null)
                {
@@ -143,7 +143,7 @@ namespace Sebastien.ClassManager.Core
                ReleaseNewMsg(new Message("班主任", "发布了新课表, 快去看看吧~"));
                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", "发布了新课表"));
                UI.DisplayTheInformationOfSuccessfully();
-           }).Start();
+           });
         }
         /// <summary>
         /// 重写查看班主任信息方法

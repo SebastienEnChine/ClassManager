@@ -151,12 +151,12 @@ namespace Sebastien.ClassManager.Core
                 }
                 else
                 {
-                    new Thread(() =>
+                    Task.Run(() =>
                     {
                         me.Passwd = secondPasswd;
                         me.AddHistory(new Message("你", "重新设置了密码"));
                         DisplayTheInformationOfSuccessfully();
-                    }).Start();
+                    });
                 }
             }
             catch (FormatException)
@@ -199,7 +199,7 @@ namespace Sebastien.ClassManager.Core
         {
             Write("地址: ");
             String address = ReadLine();
-            new Thread(() => me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"))).Start(); 
+            Task.Run(() => me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"))); 
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -210,7 +210,7 @@ namespace Sebastien.ClassManager.Core
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
             TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
-            new Thread(() => me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})"))).Start();
+            Task.Run(() => me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})")));
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -313,11 +313,11 @@ namespace Sebastien.ClassManager.Core
         {
             Write("在此处输入将要广播的消息> ");
             Message msg = new Message("班主任", ReadLine());
-            new Thread(() =>
+            Task.Run(() =>
             {
                 teacher.ReleaseNewMsg(msg);
                 teacher.AddHistory(new Message("你", $"广播了一条消息: {msg.Content}"));
-            }).Start();
+            });
             DisplayTheInformationOfSuccessfully("(广播已发布)");
         }
 
@@ -329,11 +329,11 @@ namespace Sebastien.ClassManager.Core
         {
             Write("新姓名: ");
             String name = ReadLine();
-            new Thread(() =>
+            Task.Run(() =>
             {
                 InformationLibrary.HeadTeacherUser.Name = name;
                 InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"重新设置了你的姓名({name})"));
-            }).Start();
+            });
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -546,11 +546,11 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        new Thread(() =>
+                        Task.Run(() =>
                         {
                             InformationLibrary.StudentLibrary.RemoveAt(index);
                             InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
-                        }).Start();
+                        });
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
@@ -565,11 +565,11 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        new Thread(() =>
+                        Task.Run(() =>
                         {
                             InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
                             InformationLibrary.TeacherLibrary.RemoveAt(index);
-                        }).Start();
+                        });
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;

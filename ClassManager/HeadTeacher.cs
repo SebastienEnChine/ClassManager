@@ -118,7 +118,7 @@ namespace Sebastien.ClassManager.Core
         /// 发布新课表
         /// </summary>
         /// <param name="cc">新课表</param>
-        public void AddNewCurriculum()
+        public async Task AddNewCurriculum()
         {
             Curriculum cc = null;
             try
@@ -130,7 +130,7 @@ namespace Sebastien.ClassManager.Core
                 return;
             }
 
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                if (InformationLibrary._curriculums[0] == null)
                {

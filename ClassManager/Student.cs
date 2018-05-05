@@ -108,7 +108,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 订阅
         /// </summary>
-        public bool SubscriptionToHeadTeacher(Teacher teacher)
+        public async Task<bool> SubscriptionToHeadTeacher(Teacher teacher)
         {
             if (IsSubscription)
             {
@@ -117,7 +117,7 @@ namespace Sebastien.ClassManager.Core
             }
             else
             {
-                Task.Run(() =>
+                await Task.Run(() =>
                 {
                     teacher.NewMsg += ReceiveNewCurriculum;
                     IsSubscription = true;
@@ -128,7 +128,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 取消订阅
         /// </summary>
-        public bool UnsubscribeToHeadTeacher(Teacher teacher)
+        public async Task<bool> UnsubscribeToHeadTeacher(Teacher teacher)
         {
             if (! IsSubscription)
             {
@@ -137,7 +137,7 @@ namespace Sebastien.ClassManager.Core
             }
             else
             {
-                Task.Run(() => teacher.NewMsg -= ReceiveNewCurriculum);
+                await Task.Run(() => teacher.NewMsg -= ReceiveNewCurriculum);
             }
             return true;
         }

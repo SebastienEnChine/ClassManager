@@ -2,6 +2,7 @@
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
+using System.Threading.Tasks;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -181,7 +182,8 @@ namespace Sebastien.ClassManager.Core
         /// 向操作记录中添加新的操作信息
         /// </summary>
         /// <param name="message"></param>
-        public void AddHistory(Message message) => History.Add(message);
+        public async Task AddHistory(Message message) => await Task.Run(() => History.Add(message));
+
         /// <summary>
         /// 获取全部操作记录
         /// </summary>

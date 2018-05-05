@@ -1,7 +1,6 @@
 ﻿using System;
 using MySelector;
 using static System.Console;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 using System.Threading;
@@ -151,12 +150,9 @@ namespace Sebastien.ClassManager.Core
                 }
                 else
                 {
-                    Task.Run(() =>
-                    {
-                        me.Passwd = secondPasswd;
-                        me.AddHistory(new Message("你", "重新设置了密码"));
-                        DisplayTheInformationOfSuccessfully();
-                    });
+                    me.Passwd = secondPasswd;
+                    me.AddHistory(new Message("你", "重新设置了密码"));
+                    DisplayTheInformationOfSuccessfully();
                 }
             }
             catch (FormatException)
@@ -199,7 +195,7 @@ namespace Sebastien.ClassManager.Core
         {
             Write("地址: ");
             String address = ReadLine();
-            Task.Run(() => me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"))); 
+            me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"));
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -210,7 +206,7 @@ namespace Sebastien.ClassManager.Core
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
             TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
-            Task.Run(() => me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})")));
+            me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})"));
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -313,11 +309,8 @@ namespace Sebastien.ClassManager.Core
         {
             Write("在此处输入将要广播的消息> ");
             Message msg = new Message("班主任", ReadLine());
-            Task.Run(() =>
-            {
-                teacher.ReleaseNewMsg(msg);
-                teacher.AddHistory(new Message("你", $"广播了一条消息: {msg.Content}"));
-            });
+            teacher.ReleaseNewMsg(msg);
+            teacher.AddHistory(new Message("你", $"广播了一条消息: {msg.Content}"));
             DisplayTheInformationOfSuccessfully("(广播已发布)");
         }
 
@@ -329,11 +322,10 @@ namespace Sebastien.ClassManager.Core
         {
             Write("新姓名: ");
             String name = ReadLine();
-            Task.Run(() =>
-            {
-                InformationLibrary.HeadTeacherUser.Name = name;
-                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"重新设置了你的姓名({name})"));
-            });
+
+            InformationLibrary.HeadTeacherUser.Name = name;
+
+            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"重新设置了你的姓名({name})"));
             DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
@@ -374,7 +366,7 @@ namespace Sebastien.ClassManager.Core
                 }
             }
         }
-        
+
         /// <summary>
         /// 添加新生
         /// </summary>
@@ -546,11 +538,8 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        Task.Run(() =>
-                        {
-                            InformationLibrary.StudentLibrary.RemoveAt(index);
-                            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
-                        });
+                        InformationLibrary.StudentLibrary.RemoveAt(index);
+                        InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
@@ -565,11 +554,8 @@ namespace Sebastien.ClassManager.Core
                     String result = ReadLine();
                     if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
                     {
-                        Task.Run(() =>
-                        {
-                            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
-                            InformationLibrary.TeacherLibrary.RemoveAt(index);
-                        });
+                        InformationLibrary.TeacherLibrary.RemoveAt(index);
+                        InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;

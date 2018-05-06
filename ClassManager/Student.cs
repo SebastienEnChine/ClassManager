@@ -108,12 +108,11 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 订阅
         /// </summary>
-        public async Task<bool> SubscriptionToHeadTeacher(Teacher teacher)
+        public async void SubscriptionToHeadTeacher(Teacher teacher)
         {
             if (IsSubscription)
             {
                 UI.DisplayTheInformationOfErrorCode(ErrorCode.DuplicateSubscriptions);
-                return false;
             }
             else
             {
@@ -122,24 +121,23 @@ namespace Sebastien.ClassManager.Core
                     teacher.NewMsg += ReceiveNewCurriculum;
                     IsSubscription = true;
                 });
+                UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
             }
-            return true;
         }
         /// <summary>
         /// 取消订阅
         /// </summary>
-        public async Task<bool> UnsubscribeToHeadTeacher(Teacher teacher)
+        public async void UnsubscribeToHeadTeacher(Teacher teacher)
         {
             if (! IsSubscription)
             {
                 UI.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
-                return false;
             }
             else
             {
                 await Task.Run(() => teacher.NewMsg -= ReceiveNewCurriculum);
+                UI.DisplayTheInformationOfSuccessfully("取消订阅成功");
             }
-            return true;
         }
         /// <summary>
         /// 实现IComparable接口

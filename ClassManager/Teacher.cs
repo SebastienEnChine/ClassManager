@@ -47,7 +47,7 @@ namespace Sebastien.ClassManager.Core
         /// 发布新通知
         /// </summary>
         /// <param name="msg">消息</param>
-        public async Task ReleaseNewMsg(Message msg) => await Task.Run(() => NewMsg?.Invoke(this, msg));
+        public async void ReleaseNewMsg(Message msg) => await Task.Run(() => NewMsg?.Invoke(this, msg));
 
         /// <summary>
         /// 重写用户基类的ToString()方法

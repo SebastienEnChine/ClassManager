@@ -159,7 +159,6 @@ namespace Sebastien.ClassManager.Core
             {
                 DisplayTheInformationOfErrorCode(ErrorCode.ArgumentError);
             }
-
         }
         /// <summary>
         /// 修改年龄 TODO: 

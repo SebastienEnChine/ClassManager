@@ -187,16 +187,10 @@ namespace Sebastien.ClassManager.Core
                     stu.DisplayTeacherList();
                     break;
                 case Command.SubscriptionToHeadTeacher:
-                    if (stu.SubscriptionToHeadTeacher(InformationLibrary.HeadTeacherUser))
-                    {
-                        UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
-                    }
+                    stu.SubscriptionToHeadTeacher(InformationLibrary.HeadTeacherUser);
                     break;
                 case Command.UnsubscribeToHeadTeacher:
-                    if (stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser))
-                    {
-                        UI.DisplayTheInformationOfSuccessfully("(取消订阅成功)");
-                    }
+                    stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser);
                     break;
                 default:
                     UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);

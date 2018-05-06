@@ -118,7 +118,7 @@ namespace Sebastien.ClassManager.Core
         /// 发布新课表
         /// </summary>
         /// <param name="cc">新课表</param>
-        public async Task AddNewCurriculum()
+        public async void AddNewCurriculum()
         {
             Curriculum cc = null;
             try

@@ -182,7 +182,7 @@ namespace Sebastien.ClassManager.Core
         /// 向操作记录中添加新的操作信息
         /// </summary>
         /// <param name="message"></param>
-        public async Task AddHistory(Message message) => await Task.Run(() => History.Add(message));
+        public async void AddHistory(Message message) => await Task.Run(() => History.Add(message));
 
         /// <summary>
         /// 获取全部操作记录

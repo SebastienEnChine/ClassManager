@@ -7,7 +7,7 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 老师抽象基类
     /// </summary>
-    public abstract class Teacher : User
+    public class Teacher : User
     {
         /// <summary>
         /// 从业年份
@@ -46,7 +46,8 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 发布新通知
         /// </summary>
-        /// <param name="msg">消息</param>
+        /// <param name="msg">消息</param>       
+        //await Task.Factory.FromAsync(NewMsg.BeginInvoke, NewMsg.EndInvoke, this, msg, null);
         public async void ReleaseNewMsg(Message msg) => await Task.Run(() => NewMsg?.Invoke(this, msg));
 
         /// <summary>

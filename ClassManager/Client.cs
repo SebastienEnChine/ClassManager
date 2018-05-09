@@ -360,57 +360,76 @@ namespace Sebastien.ClassManager.Core
             }
         }
         /// <summary>
+        /// 检查账户是否存在(旧版本)
+        /// </summary>
+        /// <param name="account">账户</param>
+        /// <returns>true: 不存在， false: 已存在</returns>
+        [Obsolete("此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
+        public static User CheckAccountAvailabilityOldVersionAndNeedOtherClass(String account) //依赖于User.cs文件中的FindAccount <T> 类
+        {
+            int index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
+            if (index1 != -1)
+            {
+                return InformationLibrary.StudentLibrary[index1];
+            }
+            int index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
+            if (index2 != -1)
+            {
+                return InformationLibrary.StudentLibrary[index2];
+            }
+            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+        }
+        /// <summary>
+        /// 检查账户是否存在(旧版本)
+        /// </summary>
+        /// <param name="account">账户</param>
+        /// <returns>true: 不存在， false: 已存在</returns>
+        [Obsolete("此方法使用Lambda表达式, 但同一表达式使用多次")]
+        public static User CheckAccountAvailabilityOldVersionLambda(String account)
+        {
+            int index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
+            if (index1 != -1)
+            {
+                return InformationLibrary.StudentLibrary[index1];
+            }
+            int index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
+            if (index2 != -1)
+            {
+                return InformationLibrary.StudentLibrary[index2];
+            }
+            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+        }
+        /// <summary>
+        /// 检查账户是否存在(旧版本)
+        /// </summary>
+        /// <param name="account">账户</param>
+        /// <returns>true: 不存在， false: 已存在</returns>
+        [Obsolete("使用传统for循环的旧版本")]
+        public static User CheckAccountAvailabilityOldVersionNormal(String account)
+        {
+            foreach (var index in InformationLibrary.StudentLibrary)
+            {
+                if (account.Equals(index.Account))
+                {
+                    return index;
+                }
+            }
+            foreach (var index in InformationLibrary.TeacherLibrary)
+            {
+                if (account.Equals(index.Account))
+                {
+                    return index;
+                }
+            }
+            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+        }
+        /// <summary>
         /// 检查账户是否存在
         /// </summary>
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
         public static User CheckAccountAvailability(String account)
         {
-            #region Normal
-            //foreach (var index in _source.StudentLibrary)
-            //{
-            //    if (account.Equals(index.Account))
-            //    {
-            //        return index;
-            //    }
-            //}
-            //foreach (var index in _source.TeacherLibrary)
-            //{
-            //    if (account.Equals(index.Account))
-            //    {
-            //        return index;
-            //    }
-            //}
-            #endregion
-
-            //依赖于User.cs文件中的FindAccount <T> 类
-            #region "Delegate = method" Style, source: List<T>.FindIndex(Predicate<T> match) 
-            //int index1 = _source.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
-            //if (index1 != -1)
-            //{
-            //    return _source.StudentLibrary[index1];
-            //}
-            //int index2 = _source.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
-            //if (index2 != -1)
-            //{
-            //    return _source.StudentLibrary[index2];
-            //}
-            #endregion
-
-            #region "Delegate = Lambda" Style, source: List<T>.FindIndex(Predicate<T> match) 
-            //int index1 = _source.StudentLibrary.FindIndex(u => u.Account == account);
-            //if (index1 != -1)
-            //{
-            //    return _source.StudentLibrary[index1];
-            //}
-            //int index2 = _source.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
-            //if (index2 != -1)
-            //{
-            //    return _source.StudentLibrary[index2];
-            //}
-            #endregion
-
-            #region Find() And "Local function" Style
             Student stu = InformationLibrary.StudentLibrary.Find(IsEquals);
             if (stu != default(Student))
             {
@@ -421,7 +440,6 @@ namespace Sebastien.ClassManager.Core
             {
                 return index2;
             }
-            #endregion
 
             return (IsEquals(InformationLibrary.HeadTeacherUser)) ? InformationLibrary.HeadTeacherUser : null;
 
@@ -452,35 +470,39 @@ namespace Sebastien.ClassManager.Core
             return InformationLibrary._curriculums[1] == null;
         }
         /// <summary>
-        /// 检查已失效的课表并删除
+        /// 检查已失效的课表并删除(没有使用" ?. "条件运算符的旧方法)
+        /// </summary>
+        [Obsolete("此方法没有使用 ?. 运算符,  代码过于冗长, 请使用此方法的新版本")]
+        public static void UpdateCurriculumOldVersion()
+        {
+            if (InformationLibrary._curriculums[0] != null)
+            {
+                if (InformationLibrary._curriculums[1] != null)
+                {
+                    if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
+                    {
+                        if (DateTime.Now > InformationLibrary._curriculums[1].OverTime)
+                        {
+                            InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1] = null;
+                        }
+                        InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1];
+                        InformationLibrary._curriculums[1] = null;
+                    }
+                }
+                else
+                {
+                    if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
+                    {
+                        InformationLibrary._curriculums[0] = null;
+                    }
+                }
+            }
+        }
+        /// <summary>
+        /// 检查已失效的课表并删除(使用" ?. "条件运算符的新方法)
         /// </summary>
         public static void UpdateCurriculum()
         {
-            //不使用条件运算符：
-            //if (InformationLibrary._curriculums[0] != null)
-            //{
-            //    if (InformationLibrary._curriculums[1] != null)
-            //    {
-            //        if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
-            //        {
-            //            if (DateTime.Now > InformationLibrary._curriculums[1].OverTime)
-            //            {
-            //                InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1] = null;
-            //            }
-            //            InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1];
-            //            InformationLibrary._curriculums[1] = null;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
-            //        {
-            //            InformationLibrary._curriculums[0] = null;
-            //        }
-            //    }
-            //}
-
-            //使用" ?. "条件运算符
             //<!>DateTime结构体变量于null比较始终为false</!>
             if (DateTime.Now > InformationLibrary._curriculums[0]?.OverTime)
             {

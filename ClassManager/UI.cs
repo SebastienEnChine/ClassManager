@@ -3,7 +3,7 @@ using MySelector;
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
-using System.Threading;
+using System.Diagnostics;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -22,54 +22,76 @@ namespace Sebastien.ClassManager.Core
             switch (me.UserType)
             {
                 case Identity.Student:
-                    GetHelpForUser();
-                    WriteLine("MyScore: 查看各科目成绩");
-                    WriteLine("ViewNews: 查看我收到的新消息");
-                    WriteLine("ViewAllNews: 查看消息记录");
-                    WriteLine("SubscriptionToHeadTeacher: 订阅班主任");
-                    WriteLine("UnsubscribeToHeadTeacher: 取消订阅班主任");
+                    GetHelpForStudent();
                     break;
                 case Identity.Instructor:
-                    GetHelpForUser();
-                    WriteLine("AllSocre: 显示本班学生的本科目成绩(不排序)");
-                    WriteLine("AllSocreAndRank: 显示本班学生的本科目成绩(排序)");
-                    WriteLine("ChangeScore: 设置或修改学生的成绩");
-                    WriteLine("HighThan: 查看高于指定分数的所有学生");
-                    WriteLine("ReleaseAMsg: 广播一条消息");
+                    GetHelpForInstructor();
                     break;
                 case Identity.HeadTeacher:
-                    WriteLine("AddStudent: 新生注册");
-                    WriteLine("AddTeacher: 新老师注册");
-                    WriteLine("Remove: 永久删除一位学生或老师账号");
-                    WriteLine("AllSocre: 显示本班学生的成绩(不排序)");
-                    WriteLine("AllSocreAndRank: 显示本班学生的成绩(排序)");
-                    WriteLine("HighThan: 查看总分高于指定分数的所有学生");
-                    WriteLine("ChangeName: 修改姓名");
-                    WriteLine("ReleaseNewCurriculum: 发布新课表");
-                    WriteLine("ReleaseAMsg: 广播一条消息");
-                    GetHelpForUser();
+                    GetHelpForHeadTeacher();
                     break;
                 default:
                     throw new ArgumentException();
             }
-            /// <summary>
-            /// 获取帮助
-            /// </summary>
-            void GetHelpForUser()
-            {
-                WriteLine("SwitchUser: 切换用户");
-                WriteLine("ChangePasswd: 修改密码");
-                WriteLine("ChangeAge: 修改年龄");
-                WriteLine("ChangeAddress: 修改地址");
-                WriteLine("ChangeSex: 修改性别");
-                WriteLine("ShowMe: 个人信息概览");
-                WriteLine("StudentsPreview: 学生列表预览");
-                WriteLine("TeachersPreview: 教师列表预览");
-                WriteLine("ViewCurriculums: 查看课表");
-                WriteLine("ViewMyHistory: 查看我的操作记录");
-                WriteLine("Exit: 退出程序");
-            }
         }
+        /// <summary>
+        /// 获取基本帮助
+        /// </summary>
+        public static void GetHelpForUser()
+        {
+            WriteLine("SwitchUser: 切换用户");
+            WriteLine("ChangePasswd: 修改密码");
+            WriteLine("ChangeAge: 修改年龄");
+            WriteLine("ChangeAddress: 修改地址");
+            WriteLine("ChangeSex: 修改性别");
+            WriteLine("ShowMe: 个人信息概览");
+            WriteLine("StudentsPreview: 学生列表预览");
+            WriteLine("TeachersPreview: 教师列表预览");
+            WriteLine("ViewCurriculums: 查看课表");
+            WriteLine("ViewMyHistory: 查看我的操作记录");
+            WriteLine("Exit: 退出程序");
+        }
+        /// <summary>
+        /// 获取帮助(学生用户)
+        /// </summary>
+        public static void GetHelpForStudent()
+        {
+            GetHelpForUser();
+            WriteLine("MyScore: 查看各科目成绩");
+            WriteLine("ViewNews: 查看我收到的新消息");
+            WriteLine("ViewAllNews: 查看消息记录");
+            WriteLine("SubscriptionToHeadTeacher: 订阅班主任");
+            WriteLine("UnsubscribeToHeadTeacher: 取消订阅班主任");
+        }
+        /// <summary>
+        /// 获取帮助(教师用户)
+        /// </summary>
+        public static void GetHelpForInstructor()
+        {
+            GetHelpForUser();
+            WriteLine("AllSocre: 显示本班学生的本科目成绩(不排序)");
+            WriteLine("AllSocreAndRank: 显示本班学生的本科目成绩(排序)");
+            WriteLine("ChangeScore: 设置或修改学生的成绩");
+            WriteLine("HighThan: 查看高于指定分数的所有学生");
+            WriteLine("ReleaseAMsg: 广播一条消息");
+        }
+        /// <summary>
+        /// 获取帮助(班主任用户)
+        /// </summary>
+        public static void GetHelpForHeadTeacher()
+        {
+            GetHelpForUser();
+            WriteLine("AddStudent: 新生注册");
+            WriteLine("AddTeacher: 新老师注册");
+            WriteLine("Remove: 永久删除一位学生或老师账号");
+            WriteLine("AllSocre: 显示本班学生的成绩(不排序)");
+            WriteLine("AllSocreAndRank: 显示本班学生的成绩(排序)");
+            WriteLine("HighThan: 查看总分高于指定分数的所有学生");
+            WriteLine("ChangeName: 修改姓名");
+            WriteLine("ReleaseNewCurriculum: 发布新课表");
+            WriteLine("ReleaseAMsg: 广播一条消息");
+        }
+        
         /// <summary>
         /// 显示命令提示符
         /// </summary>
@@ -131,29 +153,14 @@ namespace Sebastien.ClassManager.Core
             }
         }
         /// <summary>
-        /// 修改密码
+        /// 修改密码(调用和异常处理)
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void ChangeMyPasswd(this User me)
+        public static void CallChangeMyPasswd(this User me)
         {
             try
             {
-                Write("请输入当前密码: ");
-                string currentPasswd = ReadLine();
-                Write("请输入新密码: ");
-                string firstPasswd = ReadLine();
-                Write("请再次输入新密码: ");
-                string secondPasswd = ReadLine();
-                if (!firstPasswd.Equals(secondPasswd))
-                {
-                    DisplayTheInformationOfErrorCode(ErrorCode.InconsistentPassword);
-                }
-                else
-                {
-                    me.Passwd = secondPasswd;
-                    me.AddHistory(new Message("你", "重新设置了密码"));
-                    DisplayTheInformationOfSuccessfully();
-                }
+                me.ChangeMyPasswd();
             }
             catch (FormatException)
             {
@@ -161,21 +168,37 @@ namespace Sebastien.ClassManager.Core
             }
         }
         /// <summary>
-        /// 修改年龄 TODO: 
+        /// 修改密码
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void ChangeMyAge(this User me)
+        public static void ChangeMyPasswd(this User me)
         {
-            Write("请输入你当前的年龄: ");
+            Write("请输入当前密码: ");
+            string currentPasswd = ReadLine();
+            Write("请输入新密码: ");
+            string firstPasswd = ReadLine();
+            Write("请再次输入新密码: ");
+            string secondPasswd = ReadLine();
+            if (!firstPasswd.Equals(secondPasswd))
+            {
+                DisplayTheInformationOfErrorCode(ErrorCode.InconsistentPassword);
+            }
+            else
+            {
+                me.Passwd = secondPasswd;
+                me.AddHistory(new Message("你", "重新设置了密码"));
+                DisplayTheInformationOfSuccessfully();
+            }
+        }
+        /// <summary>
+        /// 修改年龄(调用和异常处理)
+        /// </summary>
+        /// <param name="me">当前用户</param>
+        public static void CallChangeMyAge(this User me)
+        {
             try
             {
-                if (!int.TryParse(ReadLine(), out int age))
-                {
-                    throw new ArgumentException();
-                }
-                me.Age = age;
-                me.AddHistory(new Message("你", $"重新设置了年龄({me.Age})"));
-                DisplayTheInformationOfSuccessfully();
+                me.ChangeMyAge();
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -184,6 +207,24 @@ namespace Sebastien.ClassManager.Core
             catch (ArgumentException)
             {
                 DisplayTheInformationOfErrorCode(ErrorCode.ArgumentError);
+            }
+        }
+        /// <summary>
+        /// 修改年龄
+        /// </summary>
+        /// <param name="me">当前用户</param>
+        public static void ChangeMyAge(this User me)
+        {
+            Write("请输入你当前的年龄: ");
+            if (int.TryParse(ReadLine(), out int age))
+            {
+                me.Age = age;
+                me.AddHistory(new Message("你", $"重新设置了年龄({me.Age})"));
+                DisplayTheInformationOfSuccessfully();
+            }
+            else
+            {
+                throw new ArgumentException();
             }
         }
         /// <summary>
@@ -370,37 +411,11 @@ namespace Sebastien.ClassManager.Core
         /// 添加新生
         /// </summary>
         /// <param name="info">所有用户信息库</param>
-        public static void AddStudent(this HeadTeacher ht)
+        public static void CallAddStudent(this HeadTeacher ht)
         {
             try
             {
-                Write("账号: ");
-                String account = ReadLine();
-                if (account.Contains(" ") || account.Equals(String.Empty))
-                {
-                    throw new NullReferenceException("Account is Empty");
-                }
-
-                if (Client.CheckAccountAvailability(account) != null)
-                {
-                    DisplayTheInformationOfErrorCode(ErrorCode.AccountAlreadyExists, account);
-                    return;
-                }
-
-                Write("密码: ");
-                String passwd = EnterPasswd();
-                if (passwd.Contains(" ") || passwd.Equals(String.Empty))
-                {
-                    throw new NullReferenceException("Passwd is Empty");
-
-                }
-
-                Write("姓名: ");
-                String name = ReadLine();
-                InformationLibrary.StudentLibrary.Add(new Student(account, passwd, name));
-                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"注册了一个学生账户({account})"));
-                ht.ReleaseNewMsg(new Message("班主任", $"班里来了一位新同学({account}), 快去看看吧~"));
-                DisplayTheInformationOfSuccessfully();
+                ht.AddStudent();
             }
             catch (NullReferenceException ex) when (ex.Message.Equals("Account is Empty"))
             {
@@ -412,7 +427,63 @@ namespace Sebastien.ClassManager.Core
             }
         }
         /// <summary>
-        /// 添加/注册新老师  TODO: 需要更优解决方案
+        /// 添加新生
+        /// </summary>
+        /// <param name="info">所有用户信息库</param>
+        public static void AddStudent(this HeadTeacher ht)
+        {
+            Write("账号: ");
+            String account = ReadLine();
+            if (account.Contains(" ") || account.Equals(String.Empty))
+            {
+                throw new NullReferenceException("Account is Empty");
+            }
+
+            if (Client.CheckAccountAvailability(account) != null)
+            {
+                DisplayTheInformationOfErrorCode(ErrorCode.AccountAlreadyExists, account);
+                return;
+            }
+
+            Write("密码: ");
+            String passwd = EnterPasswd();
+            if (passwd.Contains(" ") || passwd.Equals(String.Empty))
+            {
+                throw new NullReferenceException("Passwd is Empty");
+            }
+
+            Write("姓名: ");
+            String name = ReadLine();
+            InformationLibrary.StudentLibrary.Add(new Student(account, passwd, name));
+            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"注册了一个学生账户({account})"));
+            ht.ReleaseNewMsg(new Message("班主任", $"班里来了一位新同学({account}), 快去看看吧~"));
+            DisplayTheInformationOfSuccessfully();
+        }
+        /// <summary>
+        /// 添加/注册新老师(调用和异常处理)
+        /// </summary>
+        /// <param name="info">所有用户信息库</param>
+        public static void CallAddTeacher(this HeadTeacher ht)
+        {
+            try
+            {
+                ht.AddTeacher();
+            }
+            catch (NullReferenceException ex) when (ex.Message.Equals("Account is Empty"))
+            {
+                DisplayTheInformationOfErrorCode(ErrorCode.BadAccount);
+            }
+            catch (NullReferenceException ex) when (ex.Message.Equals("Passwd is Empty"))
+            {
+                DisplayTheInformationOfErrorCode(ErrorCode.BadAccount);
+            }
+            catch (ArgumentException)
+            {
+                DisplayTheInformationOfErrorCode(ErrorCode.ArgumentError);
+            }
+        }
+        /// <summary>
+        /// 添加/注册新老师
         /// </summary>
         /// <param name="info">所有用户信息库</param>
         public static void AddTeacher(this HeadTeacher ht)
@@ -438,71 +509,49 @@ namespace Sebastien.ClassManager.Core
                                                  Subject.SQL
                                            }
                                        ).GetSubject();
-            try
+            Write("账号: ");
+            String account = ReadLine();
+            if (account.Contains(" ") || account.Equals(String.Empty))
             {
-                Write("账号: ");
-                String account = ReadLine();
-                if (account.Contains(" ") || account.Equals(String.Empty))
-                {
-                    throw new NullReferenceException("Account is Empty");
-                }
-                if (Client.CheckAccountAvailability(account) != null)
-                {
-                    DisplayTheInformationOfErrorCode(ErrorCode.AccountAlreadyExists, account);
-                    return;
-                }
-
-                Write("密码: ");
-                String passwd = EnterPasswd();
-                if (passwd.Contains(" ") || passwd.Equals(String.Empty))
-                {
-                    throw new NullReferenceException("Passwd is Empty");
-                }
-
-                Write("姓名: ");
-                String name = ReadLine();
-
-                WriteLine("此用户从哪一年开始从事该行业？");
-                Write("> ");
-                if (!int.TryParse(ReadLine(), out int years))
-                {
-                    throw new ArgumentException();
-                }
-
-                InformationLibrary.TeacherLibrary.Add(new Instructor(account, passwd, name, years, result));
-                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"注册了一个教师账户({account})"));
-                ht.ReleaseNewMsg(new Message("班主任", $"班里来了一位新老师({account}), 快去看看吧~"));
-                DisplayTheInformationOfSuccessfully();
+                throw new NullReferenceException("Account is Empty");
             }
-            catch (NullReferenceException ex) when (ex.Message.Equals("Account is Empty"))
+            if (Client.CheckAccountAvailability(account) != null)
             {
-                DisplayTheInformationOfErrorCode(ErrorCode.BadAccount);
+                DisplayTheInformationOfErrorCode(ErrorCode.AccountAlreadyExists, account);
+                return;
             }
-            catch (NullReferenceException ex) when (ex.Message.Equals("Passwd is Empty"))
+
+            Write("密码: ");
+            String passwd = EnterPasswd();
+            if (passwd.Contains(" ") || passwd.Equals(String.Empty))
             {
-                DisplayTheInformationOfErrorCode(ErrorCode.BadAccount);
+                throw new NullReferenceException("Passwd is Empty");
             }
-            catch (ArgumentException)
+
+            Write("姓名: ");
+            String name = ReadLine();
+
+            WriteLine("此用户从哪一年开始从事该行业？");
+            Write("> ");
+            if (!int.TryParse(ReadLine(), out int years))
             {
-                DisplayTheInformationOfErrorCode(ErrorCode.ArgumentError);
+                throw new ArgumentException();
             }
+
+            InformationLibrary.TeacherLibrary.Add(new Instructor(account, passwd, name, years, result));
+            InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"注册了一个教师账户({account})"));
+            ht.ReleaseNewMsg(new Message("班主任", $"班里来了一位新老师({account}), 快去看看吧~"));
+            DisplayTheInformationOfSuccessfully();
         }
         /// <summary>
-        /// 修改学生的成绩
+        /// 修改学生的成绩(调用和异常处理)
         /// </summary>
-        /// <param name="info">所有学生信息</param>
         /// <param name="curr">执行此命令的老师</param>
-        public static void ChangeScore(this Instructor curr)
+        public static void CallChangeScore(this Instructor curr)
         {
             try
             {
-                Write("请输入将要修改的学生的账户: ");
-                String account = ReadLine();
-                Student temp = InformationLibrary.StudentLibrary.Find(s => s.Account == account) as Student
-                    ?? throw new NullReferenceException();
-                Write("分数: ");
-                temp[curr.TeachingRange] = Double.Parse(ReadLine());
-                curr.AddHistory(new Message("你", $"修改了{account}的分数: {temp[curr.TeachingRange]}"));
+                curr.ChangeScore();
             }
             catch (NullReferenceException)
             {
@@ -520,6 +569,21 @@ namespace Sebastien.ClassManager.Core
             {
                 WriteLine(e.Message);
             }
+        }
+        /// <summary>
+        /// 修改学生的成绩
+        /// </summary>
+        /// <param name="curr">执行此命令的老师</param>
+        public static void ChangeScore(this Instructor curr)
+        {
+            Write("请输入将要修改的学生的账户: ");
+            String account = ReadLine();
+            Student temp = InformationLibrary.StudentLibrary
+                .Find(s => s.Account == account) as Student
+                ?? throw new NullReferenceException();
+            Write("分数: ");
+            temp[curr.TeachingRange] = Double.Parse(ReadLine());
+            curr.AddHistory(new Message("你", $"修改了{account}的分数: {temp[curr.TeachingRange]}"));
         }
         /// <summary>
         /// 移除账户   TODO: 需要更优解决方案
@@ -698,6 +762,12 @@ namespace Sebastien.ClassManager.Core
                 case ErrorCode.ArgumentOutOfRange:
                     WriteLine("参数过大或过小");
                     break;
+                case ErrorCode.BadAccount:
+                    WriteLine("账号不能为空或者包含空格");
+                    break;
+                case ErrorCode.BadPasswd:
+                    WriteLine("密码不能为空或者包含空格");
+                    break;
                 default:
                     break;
             }
@@ -708,11 +778,12 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public static void DisplayTheInformationOfSuccessfully(String msg = "(已完成)")
         {
-            BackgroundColor = ConsoleColor.Black;
-            ForegroundColor = ConsoleColor.Green;
-            Beep();
-            WriteLine(msg);
-            DefaultColor();
+            //BackgroundColor = ConsoleColor.Black;
+            //ForegroundColor = ConsoleColor.Green;
+            //Beep();
+            //WriteLine(msg);
+            //DefaultColor();
+            Process.Start(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\DisplayInfo\bin\Debug\DisplayInfo.exe", msg);
         }
         /// <summary>
         /// 将字符串以指定颜色显示

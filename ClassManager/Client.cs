@@ -106,10 +106,10 @@ namespace Sebastien.ClassManager.Core
                     currentUser.ViewPersonalInformation();
                     break;
                 case Command.ChangePasswd:
-                    currentUser.ChangeMyPasswd();
+                    currentUser.CallChangeMyPasswd();
                     break;
                 case Command.ChangeAge:
-                    currentUser.ChangeMyAge();
+                    currentUser.CallChangeMyAge();
                     break;
                 case Command.ChangeAddress:
                     currentUser.ChangeMyAddress();
@@ -246,7 +246,7 @@ namespace Sebastien.ClassManager.Core
                     teacher.DisplayAllScoreOfStudent(State.on, State.on);
                     break;
                 case Command.ChangeScore:
-                    teacher.ChangeScore();
+                    teacher.CallChangeScore();
                     break;
                 case Command.HighThan:
                     teacher.DisplayScoreHighThan();
@@ -302,10 +302,10 @@ namespace Sebastien.ClassManager.Core
                     headTeacher.ChangeNameOfOtherUser();
                     break;
                 case Command.AddStudent:
-                    headTeacher.AddStudent();
+                    headTeacher.CallAddStudent();
                     break;
                 case Command.AddTeacher:
-                    headTeacher.AddTeacher();
+                    headTeacher.CallAddTeacher();
                     break;
                 case Command.Remove:
                     headTeacher.RemoveAccount();

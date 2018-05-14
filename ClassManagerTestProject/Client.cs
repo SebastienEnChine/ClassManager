@@ -20,6 +20,12 @@ namespace Sebastien.ClassManager.TestProject
             Assert.AreEqual(expected, cmd);
         }
         [TestMethod]
+        public void GetSelectorObjectTest()
+        {
+            //arrange
+            Assert.AreEqual(typeof(MySelector.Selector<Subject>), Client.GetSelectorObject().GetType());
+        }
+        [TestMethod]
         public void GetCmdTest2()
         {
             //arrange

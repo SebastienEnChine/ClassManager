@@ -1,7 +1,7 @@
 ﻿using System;
 using static System.Console;
 using Sebastien.ClassManager.Enums;
-
+using System.Reflection;
 #region 其他需求
 //其他: 
 //          2: 切换用户之后 窗口标题显示对应用户类型
@@ -61,6 +61,39 @@ namespace Sebastien.ClassManager.Core
                         throw new ArgumentException();
                 }
              }
+        }
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <returns>User: sucessfully, null: faild</returns>
+        public static User Login()
+        {
+            User user = null;
+            while (true)
+            {
+                user = IdentityCheck(UI.GetInformationForLogin());
+                if (user == null)
+                {
+                    UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
+                }
+                else
+                {
+                    UI.DisplayTheInformationOfSuccessfully("(登录成功)");
+                    user.SayHello();
+                    break;
+                }
+            }
+            return user;
+        }
+        /// <summary>
+        /// 加载选择器
+        /// </summary>
+        /// <returns>选择器对象</returns>
+        public static object GetSelectorObject() //TODO:
+        {
+            Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\ClassManager\bin\Debug\SelectorLib.dll");
+            return asm.CreateInstance("MySelector.Selector`1");
+
         }
         /// <summary>
         /// 获取由用户输入的命令
@@ -338,28 +371,6 @@ namespace Sebastien.ClassManager.Core
             return result;
         }
         /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns>User: sucessfully, null: faild</returns>
-        public static User Login()
-        {
-            User user = null;
-            while (true)
-            {
-                user = IdentityCheck(UI.GetInformationForLogin());
-                if (user == null)
-                {
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
-                }
-                else
-                {
-                    UI.DisplayTheInformationOfSuccessfully("(登录成功)");
-                    user.SayHello();
-                    return user;
-                }
-            }
-        }
-        /// <summary>
         /// 检查账户是否存在(旧版本)
         /// </summary>
         /// <param name="account">账户</param>
@@ -430,15 +441,15 @@ namespace Sebastien.ClassManager.Core
         /// <returns>true: 不存在， false: 已存在</returns>
         public static User CheckAccountAvailability(String account)
         {
-            Student stu = InformationLibrary.StudentLibrary.Find(IsEquals);
-            if (stu != default(Student))
+            Student student = InformationLibrary.StudentLibrary.Find(IsEquals);
+            if (student != default(Student))
             {
-                return stu;
+                return student;
             }
-            Instructor index2 = InformationLibrary.TeacherLibrary.Find(IsEquals);
-            if (index2 != default(Instructor))
+            Instructor instructor = InformationLibrary.TeacherLibrary.Find(IsEquals);
+            if (instructor != default(Instructor))
             {
-                return index2;
+                return instructor;
             }
 
             return (IsEquals(InformationLibrary.HeadTeacherUser)) ? InformationLibrary.HeadTeacherUser : null;

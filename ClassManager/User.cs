@@ -139,10 +139,10 @@ namespace Sebastien.ClassManager.Core
             if (InformationLibrary.StudentLibrary.Count > 0)
             {
                 WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10}");
-                foreach (var index in InformationLibrary.StudentLibrary)
+                Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
                 {
-                    WriteLine($"{index.Name,-10} {index.Sex,-10} {index.Age,-10}");
-                }
+                    WriteLine($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}");
+                });
             }
             else
             {
@@ -158,10 +158,10 @@ namespace Sebastien.ClassManager.Core
             if (InformationLibrary.TeacherLibrary.Count > 0)
             {
                 WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10} {"Since",-10}");
-                foreach (var index in InformationLibrary.TeacherLibrary)
+                Parallel.ForEach(InformationLibrary.TeacherLibrary, teacher =>
                 {
-                    WriteLine($"{index.Name,-10} {index.Sex,-10} {index.Age,-10} {index.YearsOfProfessional,-10}");
-                }
+                    WriteLine($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}");
+                });
             }
             else
             {

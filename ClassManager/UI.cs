@@ -507,8 +507,9 @@ namespace Sebastien.ClassManager.Core
                                                  Subject.HtmlAndCss,
                                                  Subject.Java,
                                                  Subject.SQL
-                                           }
+                                          }
                                        ).GetSubject();
+            
             Write("账号: ");
             String account = ReadLine();
             if (account.Contains(" ") || account.Equals(String.Empty))

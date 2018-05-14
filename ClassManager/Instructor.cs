@@ -3,6 +3,7 @@ using System.Linq;
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
+using System.Threading.Tasks;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -95,18 +96,18 @@ namespace Sebastien.ClassManager.Core
         {
             try
             {
-                if(score < 0 || score > 100)
+                if (score < 0 || score > 100)
                 {
                     throw new ArgumentOutOfRangeException();
                 }
-                IEnumerable<Student> result = from s in InformationLibrary.StudentLibrary
-                                              where s[TeachingRange] >= score
-                                              select s;
-                WriteLine($"{"Name", -10}{"Score"}");
-                foreach(Student index in result)
+                IEnumerable<Student> result = from stu in InformationLibrary.StudentLibrary
+                                                                    where stu[TeachingRange] >= score
+                                                                    select stu;
+                WriteLine($"{"Name",-10}{"Score"}");
+                Parallel.ForEach(result, stu =>
                 {
-                    WriteLine($"{index.Name, -10}{index[TeachingRange], -10}");
-                }
+                    WriteLine($"{stu.Name,-10}{stu[TeachingRange],-10}");
+                });
             }
             catch(ArgumentOutOfRangeException)
             {

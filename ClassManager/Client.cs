@@ -2,6 +2,8 @@
 using static System.Console;
 using Sebastien.ClassManager.Enums;
 using System.Reflection;
+using System.Collections.Generic;
+
 #region 其他需求
 //其他: 
 //          2: 切换用户之后 窗口标题显示对应用户类型
@@ -44,7 +46,7 @@ namespace Sebastien.ClassManager.Core
             User currentUser = Login();
 
             while (ApplicationState == State.on)
-             {
+            {
                 currentUser.Prompt();
                 switch (currentUser.UserType)
                 {
@@ -60,7 +62,7 @@ namespace Sebastien.ClassManager.Core
                     default:
                         throw new ArgumentException();
                 }
-             }
+            }
         }
         /// <summary>
         /// 登录
@@ -89,11 +91,13 @@ namespace Sebastien.ClassManager.Core
         /// 加载选择器
         /// </summary>
         /// <returns>选择器对象</returns>
-        public static object GetSelectorObject() //TODO:
+        public static object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
         {
             Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\ClassManager\bin\Debug\SelectorLib.dll");
-            return asm.CreateInstance("MySelector.Selector`1");
-
+            Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
+            Type fullTypeName = coreTypeName.MakeGenericType(typeof(Subject));
+            object[] paras = { info, selects };
+            return asm.CreateInstance(fullTypeName.FullName, true, BindingFlags.Default, null, paras, null, null);
         }
         /// <summary>
         /// 获取由用户输入的命令
@@ -325,7 +329,7 @@ namespace Sebastien.ClassManager.Core
                 case Command.ChangeSex:
                 case Command.ViewMyHistory:
                 case Command.ViewCurriculums:
-                //case Command.ViewHeadTeacher:
+                    //case Command.ViewHeadTeacher:
                     result = RunForUser(headTeacher, cmd);
                     break;
                 case Command.ChangeName:
@@ -375,7 +379,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
-        [Obsolete("此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
+        [Obsolete("方法已过期, 此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
         public static User CheckAccountAvailabilityOldVersionAndNeedOtherClass(String account) //依赖于User.cs文件中的FindAccount <T> 类
         {
             int index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
@@ -395,7 +399,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
-        [Obsolete("此方法使用Lambda表达式, 但同一表达式使用多次")]
+        [Obsolete("方法已过期, 此方法使用Lambda表达式, 但同一表达式使用多次")]
         public static User CheckAccountAvailabilityOldVersionLambda(String account)
         {
             int index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
@@ -415,7 +419,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
-        [Obsolete("使用传统for循环的旧版本")]
+        [Obsolete("方法已过期, 使用传统for循环的旧版本")]
         public static User CheckAccountAvailabilityOldVersionNormal(String account)
         {
             foreach (var index in InformationLibrary.StudentLibrary)
@@ -483,7 +487,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 检查已失效的课表并删除(没有使用" ?. "条件运算符的旧方法)
         /// </summary>
-        [Obsolete("此方法没有使用 ?. 运算符,  代码过于冗长, 请使用此方法的新版本")]
+        [Obsolete("方法已过期, 此方法没有使用 ?. 运算符,  代码过于冗长, 请使用此方法的新版本")]
         public static void UpdateCurriculumOldVersion()
         {
             if (InformationLibrary._curriculums[0] != null)

@@ -91,7 +91,7 @@ namespace Sebastien.ClassManager.Core
             WriteLine("ReleaseNewCurriculum: 发布新课表");
             WriteLine("ReleaseAMsg: 广播一条消息");
         }
-        
+
         /// <summary>
         /// 显示命令提示符
         /// </summary>
@@ -245,7 +245,10 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeMySex(this User me)
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
-            TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
+            dynamic dm = Client.GetSelectorObject(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame);
+            TheSex result = dm.GetSubject();
+            //不使用动态加载
+            //TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
             me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})"));
             DisplayTheInformationOfSuccessfully();
         }
@@ -489,16 +492,38 @@ namespace Sebastien.ClassManager.Core
         public static void AddTeacher(this HeadTeacher ht)
         {
             WriteLine("你想创建哪一科目的任课教师? (选择: 上/下方向键   确定: 回车键) ");
-            Subject result = new Selector<Subject>(
-                                          new List<String>()
-                                           {
+            #region 不使用动态加载
+            //Subject result = new Selector<Subject>(
+            //                              new List<String>()
+            //                               {
+            //                                    "C语言任课老师",
+            //                                    "C++任课老师",
+            //                                    "C#任课老师",
+            //                                    "HTML/Css任课老师",
+            //                                    "Java任课老师",
+            //                                    "SQL数据库任课老师"
+            //                               },
+            //                              new Subject[]
+            //                              {
+            //                                     Subject.C,
+            //                                     Subject.CPlusPlus,
+            //                                     Subject.CSharp,
+            //                                     Subject.HtmlAndCss,
+            //                                     Subject.Java,
+            //                                     Subject.SQL
+            //                              }
+            //                           ).GetSubject();
+            #endregion
+            dynamic dm = Client.GetSelectorObject(
+                                            new List<String>()
+                                            {
                                                 "C语言任课老师",
                                                 "C++任课老师",
                                                 "C#任课老师",
                                                 "HTML/Css任课老师",
                                                 "Java任课老师",
                                                 "SQL数据库任课老师"
-                                           },
+                                            },
                                           new Subject[]
                                           {
                                                  Subject.C,
@@ -507,9 +532,8 @@ namespace Sebastien.ClassManager.Core
                                                  Subject.HtmlAndCss,
                                                  Subject.Java,
                                                  Subject.SQL
-                                          }
-                                       ).GetSubject();
-            
+                                          });
+            Subject result = dm.GetSubject();
             Write("账号: ");
             String account = ReadLine();
             if (account.Contains(" ") || account.Equals(String.Empty))

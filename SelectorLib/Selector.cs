@@ -80,7 +80,6 @@ namespace MySelector
         /// <param name="select">选项</param>
         ///<exception cref="System.NullReferenceException">info或select为null时引发</exception>
         ///<exception cref="SelectorException">info和select长度不匹配时引发</exception>
-        ///<localize><zh-CHS>中文</zh-CHS><en>English</en></localize>
         public Selector(List<String> info, params T[] select)
         {
             if (info == null || select == null)
@@ -95,38 +94,6 @@ namespace MySelector
             Select = select.ToImmutableList();
             TheInfomationOfSelect = info.ToImmutableList();
         }
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="selectedBg">选中项背景颜色</param>
-        /// <param name="selectedFg">选中项前景颜色</param>
-        /// <param name="info">选项显示信息</param>
-        /// <param name="select">选项</param>
-        ///<exception cref="System.NullReferenceException">info或select为null时引发</exception>
-        ///<exception cref="SelectorException">info和select长度不匹配时引发</exception>
-        public Selector(ConsoleColor selectedBg, ConsoleColor selectedFg, List<String> info, params T[] select)
-            : this(info, select)
-        {
-            SelectedBackground = selectedBg;
-            SelectedForeground = selectedFg;
-        }
-        /// <summary>
-        /// 构造函数
-        /// </summary>
-        /// <param name="bg">背景颜色</param>
-        /// <param name="fg">前景颜色</param>
-        /// <param name="mainBg">焦点背景颜色</param>
-        /// <param name="mainFg">焦点前景颜色</param>
-        /// <param name="info">选项显示信息</param>
-        /// <param name="select">选项</param>
-        ///<exception cref="System.NullReferenceException">info或select为null时引发</exception>
-        ///<exception cref="SelectorException">info和select长度不匹配时引发</exception>
-        public Selector(ConsoleColor bg, ConsoleColor fg, ConsoleColor mainBg, ConsoleColor mainFg, List<String> info, params T[] select)
-            : this(mainBg, mainFg, info, select)
-        {
-            UnselectedBackground = bg;
-            UnselectedForeground = fg;
-        }
 
         /// <summary>
         /// 显示选项信息并获取用户的选择
@@ -134,6 +101,10 @@ namespace MySelector
         /// <returns>用户的选择结果</returns>
         public T GetSubject()
         {
+            //保存控制台原有颜色
+            ConsoleColor oldbg = BackgroundColor;
+            ConsoleColor oldfg = ForegroundColor;
+
             do
             {
                 DisplayTheInfomationOfSelect();
@@ -153,12 +124,17 @@ namespace MySelector
                         }
                         break;
                     case ConsoleKey.Enter:
+                        //恢复控制台原有颜色
+                        BackgroundColor = oldbg;
+                        ForegroundColor = oldfg;
+
                         return Select[_mainIndex];
                     default:
                         break;
                 }
                 SetCursorPosition(0, CursorTop - Select.Count);
             } while (true);
+
         }
         /// <summary>
         /// 显示选项信息

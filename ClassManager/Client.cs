@@ -38,7 +38,7 @@ namespace Sebastien.ClassManager.Core
         /// 程序主逻辑
         /// </summary>
         /// <param name="args">命令行参数</param>
-        static void Main(string[] args)
+        static void Main(String[] args)
         {
             UI.DefaultSetting();
             UI.AboutThisApplication();
@@ -91,12 +91,12 @@ namespace Sebastien.ClassManager.Core
         /// 加载选择器
         /// </summary>
         /// <returns>选择器对象</returns>
-        public static object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
+        public static Object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
         {
             Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\ClassManager\bin\Debug\SelectorLib.dll");
             Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
-            Type fullTypeName = coreTypeName.MakeGenericType(typeof(Subject));
-            object[] paras = { info, selects };
+            Type fullTypeName = coreTypeName.MakeGenericType(typeof(T));
+            Object[] paras = { info, selects };
             return asm.CreateInstance(fullTypeName.FullName, true, BindingFlags.Default, null, paras, null, null);
         }
         /// <summary>
@@ -183,7 +183,7 @@ namespace Sebastien.ClassManager.Core
             ForegroundColor = ConsoleColor.Yellow;
             String input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (input.Equals(String.Empty))
+            if (String.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -235,7 +235,7 @@ namespace Sebastien.ClassManager.Core
             }
             return result;
         }
-        ///         /// <summary>
+        /// <summary>
         /// 交互(针对于各科目任课老师用户)
         /// </summary>
         /// <param name="headTeacher">班主任用户</param>
@@ -245,7 +245,7 @@ namespace Sebastien.ClassManager.Core
             ForegroundColor = ConsoleColor.Yellow;
             String input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (input.Equals(String.Empty))
+            if (String.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -307,7 +307,7 @@ namespace Sebastien.ClassManager.Core
             ForegroundColor = ConsoleColor.Yellow;
             String input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (input.Equals(String.Empty))
+            if (String.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -382,12 +382,12 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
         public static User CheckAccountAvailabilityOldVersionAndNeedOtherClass(String account) //依赖于User.cs文件中的FindAccount <T> 类
         {
-            int index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
+            Int32 index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
             if (index1 != -1)
             {
                 return InformationLibrary.StudentLibrary[index1];
             }
-            int index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
+            Int32 index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
             if (index2 != -1)
             {
                 return InformationLibrary.StudentLibrary[index2];
@@ -402,12 +402,12 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 此方法使用Lambda表达式, 但同一表达式使用多次")]
         public static User CheckAccountAvailabilityOldVersionLambda(String account)
         {
-            int index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
+            Int32 index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
             if (index1 != -1)
             {
                 return InformationLibrary.StudentLibrary[index1];
             }
-            int index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
+            Int32 index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
             if (index2 != -1)
             {
                 return InformationLibrary.StudentLibrary[index2];
@@ -459,7 +459,7 @@ namespace Sebastien.ClassManager.Core
             return (IsEquals(InformationLibrary.HeadTeacherUser)) ? InformationLibrary.HeadTeacherUser : null;
 
             //Local Function For The Find() Method 
-            bool IsEquals(User u) => u.Account.Equals(account);
+            Boolean IsEquals(User u) => u.Account.Equals(account);
         }
         /// <summary>
         /// 检查登录信息
@@ -479,7 +479,7 @@ namespace Sebastien.ClassManager.Core
         /// 检查能否发布新课表
         /// </summary>
         /// <returns></returns>
-        public static bool CanAddNewCurriculum()
+        public static Boolean CanAddNewCurriculum()
         {
             UpdateCurriculum();
             return InformationLibrary._curriculums[1] == null;

@@ -25,7 +25,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="other">比较目标</param>
         /// <returns>true: 重复 false: 不重复</returns>
-        public bool FindAccountPredicate(T other) => other?.Account == _account;
+        public Boolean FindAccountPredicate(T other) => other?.Account == _account;
     }
     /// <summary>
     /// 用户抽象基类
@@ -70,13 +70,18 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public User(String account, String passwd, String name, TheSex sex, int age, String address, Identity userType)
+        public User(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType)
             : this(account, passwd, name, userType)
         {
             Sex = sex;
             _age = age;
             Address = address;
         }
+
+        /// <summary>
+        /// 同步锁
+        /// </summary>
+        private static readonly Object localLock = default(Int32);
 
         /// <summary>
         /// 账号
@@ -105,8 +110,8 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 年龄
         /// </summary>
-        protected int _age; 
-        public int Age
+        protected Int32 _age;
+        public Int32 Age
         {
             get
             {
@@ -128,7 +133,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 操作记录
         /// </summary>
-        protected List<Message> History { get; set; } = new List<Message>(); 
+        protected List<Message> History { get; set; } = new List<Message>();
 
         /// <summary>
         /// 显示学生列表
@@ -138,10 +143,25 @@ namespace Sebastien.ClassManager.Core
         {
             if (InformationLibrary.StudentLibrary.Count > 0)
             {
+                Boolean IsWhite = true;
                 WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10}");
                 Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
                 {
-                    WriteLine($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}");
+                    lock(localLock)
+                    {
+                        if (IsWhite)
+                        {
+                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.White, ConsoleColor.Black);
+                            WriteLine();
+                            IsWhite = false;
+                        }
+                        else
+                        {
+                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.Black, ConsoleColor.White);
+                            WriteLine();
+                            IsWhite = true;
+                        }
+                    }
                 });
             }
             else
@@ -157,10 +177,25 @@ namespace Sebastien.ClassManager.Core
         {
             if (InformationLibrary.TeacherLibrary.Count > 0)
             {
+                Boolean IsWhite = true;
                 WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10} {"Since",-10}");
                 Parallel.ForEach(InformationLibrary.TeacherLibrary, teacher =>
                 {
-                    WriteLine($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}");
+                    lock (localLock)
+                    {
+                        if (IsWhite)
+                        {
+                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.White, ConsoleColor.Black);
+                            WriteLine();
+                            IsWhite = false;
+                        }
+                        else
+                        {
+                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.Black, ConsoleColor.White);
+                            WriteLine();
+                            IsWhite = true;
+                        }
+                    }
                 });
             }
             else

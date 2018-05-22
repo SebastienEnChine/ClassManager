@@ -6,7 +6,7 @@ namespace DisplayInfo
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main(String[] args)
         {
             SetWindowSize(40, 5);
             BackgroundColor = ConsoleColor.Black;
@@ -16,6 +16,7 @@ namespace DisplayInfo
             {
                 WriteLine(index);
             }
+            ForegroundColor = ConsoleColor.White;
             WriteLine("-----------------------------------------");
             WriteLine("按任意键关闭窗口");
             ReadKey(true);

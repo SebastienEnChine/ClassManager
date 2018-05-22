@@ -12,7 +12,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 从业年份
         /// </summary>
-        public int YearsOfProfessional { get; }
+        public Int32 YearsOfProfessional { get; }
         public event EventHandler<Message> NewMsg;
         /// <summary>
         /// 默认构造函数
@@ -29,7 +29,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <param name="userType">用户类型</param>
-        public Teacher(String account, String passwd, String name, int years, Identity userType = Identity.Instructor)
+        public Teacher(String account, String passwd, String name, Int32 years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, userType) => YearsOfProfessional = years;
         /// <summary>
         /// 构造函数
@@ -41,7 +41,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Teacher(String account, String passwd, String name, TheSex sex, int age, String address, int years, Identity userType = Identity.Instructor)
+        public Teacher(String account, String passwd, String name, TheSex sex, Int32 age, String address, Int32 years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, sex, age, address, userType) => YearsOfProfessional = years;
         /// <summary>
         /// 发布新通知

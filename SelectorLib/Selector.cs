@@ -71,7 +71,9 @@ namespace MySelector
         /// <summary>
         /// 选中项索引
         /// </summary>
-        private int _mainIndex = 0;
+        private 
+            
+            _mainIndex = 0;
 
         /// <summary>
         /// 构造函数
@@ -134,7 +136,6 @@ namespace MySelector
                 }
                 SetCursorPosition(0, CursorTop - Select.Count);
             } while (true);
-
         }
         /// <summary>
         /// 显示选项信息

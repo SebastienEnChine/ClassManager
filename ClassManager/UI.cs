@@ -174,11 +174,11 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeMyPasswd(this User me)
         {
             Write("请输入当前密码: ");
-            string currentPasswd = ReadLine();
+            String currentPasswd = ReadLine();
             Write("请输入新密码: ");
-            string firstPasswd = ReadLine();
+            String firstPasswd = ReadLine();
             Write("请再次输入新密码: ");
-            string secondPasswd = ReadLine();
+            String secondPasswd = ReadLine();
             if (!firstPasswd.Equals(secondPasswd))
             {
                 DisplayTheInformationOfErrorCode(ErrorCode.InconsistentPassword);
@@ -216,7 +216,7 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeMyAge(this User me)
         {
             Write("请输入你当前的年龄: ");
-            if (int.TryParse(ReadLine(), out int age))
+            if (Int32.TryParse(ReadLine(), out Int32 age))
             {
                 me.Age = age;
                 me.AddHistory(new Message("你", $"重新设置了年龄({me.Age})"));
@@ -333,7 +333,7 @@ namespace Sebastien.ClassManager.Core
             try
             {
                 Write("你想将分数指定为: ");
-                teacher.GetStuHighThan(int.Parse(ReadLine()));
+                teacher.GetStuHighThan(Int32.Parse(ReadLine()));
             }
             catch (FormatException)
             {
@@ -379,7 +379,7 @@ namespace Sebastien.ClassManager.Core
         {
             Write("请输入将要更改姓名的账户：");
             String account = ReadLine();
-            for (int index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
+            for (Int32 index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
             {
                 if (account == InformationLibrary.StudentLibrary[index].Account)
                 {
@@ -393,7 +393,7 @@ namespace Sebastien.ClassManager.Core
                     return;
                 }
             }
-            for (int index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
+            for (Int32 index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
             {
                 if (account == InformationLibrary.TeacherLibrary[index].Account)
                 {
@@ -532,7 +532,7 @@ namespace Sebastien.ClassManager.Core
                                                  Subject.HtmlAndCss,
                                                  Subject.Java,
                                                  Subject.SQL
-                                          });
+                                          }) ?? throw new NullReferenceException();
             Subject result = dm.GetSubject();
             Write("账号: ");
             String account = ReadLine();
@@ -558,7 +558,7 @@ namespace Sebastien.ClassManager.Core
 
             WriteLine("此用户从哪一年开始从事该行业？");
             Write("> ");
-            if (!int.TryParse(ReadLine(), out int years))
+            if (!Int32.TryParse(ReadLine(), out Int32 years))
             {
                 throw new ArgumentException();
             }
@@ -617,7 +617,7 @@ namespace Sebastien.ClassManager.Core
         {
             Write("请输入将要移除的账户：");
             String account = ReadLine();
-            for (int index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
+            for (Int32 index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
             {
                 if (account == InformationLibrary.StudentLibrary[index].Account)
                 {
@@ -633,7 +633,7 @@ namespace Sebastien.ClassManager.Core
                     return;
                 }
             }
-            for (int index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
+            for (Int32 index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
             {
                 if (account == InformationLibrary.TeacherLibrary[index].Account)
                 {
@@ -704,9 +704,9 @@ namespace Sebastien.ClassManager.Core
         /// 获取用户输入的密码
         /// </summary>
         /// <returns>密码</returns>
-        public static string EnterPasswd()
+        public static String EnterPasswd()
         {
-            string key = string.Empty;
+            String key = String.Empty;
             ConsoleKeyInfo keyInfo;
             while (true)
             {
@@ -734,9 +734,9 @@ namespace Sebastien.ClassManager.Core
         public static Tuple<String, String> GetInformationForLogin()
         {
             Write("账号: ");
-            string account = ReadLine();
+            String account = ReadLine();
             Write("密码: ");
-            string passwd = EnterPasswd();
+            String passwd = EnterPasswd();
             return Tuple.Create(account, passwd);
         }
 
@@ -745,7 +745,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="errorCode">错误代码</param>
         /// <param name="parameter">错误参数信息</param>
-        public static void DisplayTheInformationOfErrorCode(ErrorCode code, string parameter = "parameter")
+        public static void DisplayTheInformationOfErrorCode(ErrorCode code, String parameter = "parameter")
         {
             BackgroundColor = ConsoleColor.Black;
             ForegroundColor = ConsoleColor.DarkRed;

@@ -28,11 +28,11 @@ namespace Sebastien.ClassManager.Core
         {
             get
             {
-                if ((int)index > _score.Length || index < 0)
+                if ((Int32)index > _score.Length || index < 0)
                 {
                     throw new IndexOutOfRangeException("索引越界");
                 }
-                return _score[(int)index];
+                return _score[(Int32)index];
             }
             set
             {
@@ -40,13 +40,13 @@ namespace Sebastien.ClassManager.Core
                 {
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
-                _score[(int)index] = value;
+                _score[(Int32)index] = value;
             }
         }
         /// <summary>
         /// 是否有新消息
         /// </summary>
-        public bool HasNewMsg => NewMsg.Count > 0;
+        public Boolean HasNewMsg => NewMsg.Count > 0;
         /// <summary>
         /// 新消息
         /// </summary>
@@ -58,7 +58,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 订阅状态
         /// </summary>
-        public bool IsSubscription { get; private set; } = false;
+        public Boolean IsSubscription { get; private set; } = false;
 
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace Sebastien.ClassManager.Core
         public Student(Student stu) : base(stu)
         {
             //TODO:
-            for (int index = 0; index < _score.Length; ++index)
+            for (Int32 index = 0; index < _score.Length; ++index)
             {
                 _score[index] = stu[(Subject)index];
             }
@@ -100,7 +100,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Student(String account, String passwd, String name, TheSex sex, int age, String address, Identity userType = Identity.Student)
+        public Student(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType = Identity.Student)
             : base(account, passwd, name, sex, age, address, userType)
         {
 
@@ -144,21 +144,21 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(object other) => CompareTo(other as Student);
+        public Int32 CompareTo(Object other) => CompareTo(other as Student);
         /// <summary>
         /// 实现IComparable<Student>接口
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public int CompareTo(Student other) => GetTotalScore() < other.GetTotalScore() ? 1 : -1;
+        public Int32 CompareTo(Student other) => GetTotalScore() < other.GetTotalScore() ? 1 : -1;
         /// <summary>
         /// 获取总成绩
         /// </summary>
         /// <returns>总成绩</returns>
         public Double GetTotalScore()
         {
-            double sum = default(double);
-            foreach (double? index in _score)
+            Double sum = default(Double);
+            foreach (Double? index in _score)
             {
                 sum += index ?? 0;
             }
@@ -169,7 +169,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public void ShowMyScore()
         {
-            foreach (double? index in _score)
+            foreach (Double? index in this)
             {
                 Write($"{(index == null ? "Not Set" : index.ToString()),-10}");
             }
@@ -180,10 +180,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="c"></param>
-        public void ReceiveNewCurriculum(object sender, Message msg)
-        {
-            NewMsg.Enqueue(msg);
-        }
+        public void ReceiveNewCurriculum(Object sender, Message msg) => NewMsg.Enqueue(msg);
         /// <summary>
         /// 查看新消息
         /// </summary>
@@ -221,7 +218,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="format"></param>
         /// <param name="formatProvider"></param>
         /// <returns></returns>
-        public string ToString(string format, IFormatProvider formatProvider)
+        public String ToString(String format, IFormatProvider formatProvider)
         {
             StringBuilder score = new StringBuilder();
             foreach (var index in _score)
@@ -243,7 +240,7 @@ namespace Sebastien.ClassManager.Core
                     throw new FormatException("Invalid format");
             }
         }
-        public string ToString(string format) => ToString(format, null);
+        public String ToString(String format) => ToString(format, null);
         /// <summary>
         /// 实现IEnumerable接口
         /// </summary>
@@ -262,7 +259,7 @@ namespace Sebastien.ClassManager.Core
             /// <summary>
             /// 当前索引
             /// </summary>
-            private int _position;
+            private Int32 _position;
             /// <summary>
             /// 构造函数
             /// </summary>
@@ -275,12 +272,12 @@ namespace Sebastien.ClassManager.Core
             /// <summary>
             /// 当前元素
             /// </summary>
-            public object Current => _iscore[_position];
+            public Object Current => _iscore[_position];
             /// <summary>
             /// 移动到下一元素
             /// </summary>
             /// <returns></returns>
-            public bool MoveNext() => (++_position >= _iscore.Length) ? false : true;
+            public Boolean MoveNext() => (++_position >= _iscore.Length) ? false : true;
             /// <summary>
             /// 重置当前元素
             /// </summary>
@@ -303,7 +300,7 @@ namespace Sebastien.ClassManager.Core
             /// <param name="x">用于比较的第一个学生对象</param>
             /// <param name="y">用于比较的第二个学生对象</param>
             /// <returns>比较结果</returns>
-            public int Compare(Student x, Student y) => x[_sortWay] > y[_sortWay] ? 1 : -1;
+            public Int32 Compare(Student x, Student y) => x[_sortWay] > y[_sortWay] ? 1 : -1;
         }
     }
 }

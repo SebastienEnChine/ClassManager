@@ -1,4 +1,5 @@
-﻿using Sebastien.ClassManager.Enums;
+﻿using System;
+using Sebastien.ClassManager.Enums;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -17,6 +18,6 @@ namespace Sebastien.ClassManager.Core
         /// 显示此分数以上的所有学生
         /// </summary>
         /// <param name="score">指定分数</param>
-        void GetStuHighThan(int score);
+        void GetStuHighThan(Int32 score);
     }
 }

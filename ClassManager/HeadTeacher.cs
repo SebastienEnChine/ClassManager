@@ -26,7 +26,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <param name="userType">用户类型</param>
-        private HeadTeacher(String account, String passwd, String name, int years, Identity userType = Identity.HeadTeacher) 
+        private HeadTeacher(String account, String passwd, String name, Int32 years, Identity userType = Identity.HeadTeacher) 
             : base(account, passwd, name, years, userType)
         {
 
@@ -38,7 +38,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <returns>如果HeadTeacher不为null，返回HeadTeacher对象， 否则创建一个新的HeadTeacher对象作为返回值</returns>
-        public static HeadTeacher GetHeadTeacher(String account, String passwd, String name, int years) 
+        public static HeadTeacher GetHeadTeacher(String account, String passwd, String name, Int32 years) 
             => _ht ?? ( _ht = new HeadTeacher(account, passwd, name, years));
         /// <summary>
         /// 学生成绩列表
@@ -67,7 +67,7 @@ namespace Sebastien.ClassManager.Core
         /// 显示此分数以上的所有学生
         /// </summary>
         /// <param name="score">指定分数</param>
-        public void GetStuHighThan(int score)
+        public void GetStuHighThan(Int32 score)
         {
             try
             {
@@ -104,9 +104,9 @@ namespace Sebastien.ClassManager.Core
             Curriculum NewCurriculum()
             {
                 Curriculum temp = new Curriculum();
-                for (int line = 0; line < temp.Week; ++line)
+                for (Int32 line = 0; line < temp.Week; ++line)
                 {
-                    for (int row = 0; row < temp.Classes; ++row)
+                    for (Int32 row = 0; row < temp.Classes; ++row)
                     {
                         temp[line, row] = new CurriculumContant(line.ToString(), row.ToString(), (ConsoleColor)rd.Next(14) + 1);
                     }

@@ -36,7 +36,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <param name="userType">用户类型</param>
-        public Instructor(String account, String passwd, String name, int years, Subject range, Identity userType = Identity.Instructor)
+        public Instructor(String account, String passwd, String name, Int32 years, Subject range, Identity userType = Identity.Instructor)
             : base(account, passwd, name, years, userType) => TeachingRange = range;
         /// <summary>
         /// 构造函数
@@ -48,20 +48,20 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Instructor(String account, String passwd, String name, Subject range, TheSex sex, int age, String address, int years, Identity userType = Identity.Instructor)
+        public Instructor(String account, String passwd, String name, Subject range, TheSex sex, Int32 age, String address, Int32 years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, sex, age, address, years, userType) => TeachingRange = range;
 
         /// <summary>
         /// 重写基类的ToString()方法
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => $"{base.ToString()}\n所教科目: {TeachingRange}\n";
+        public override String ToString() => $"{base.ToString()}\n所教科目: {TeachingRange}\n";
         /// <summary>
         /// 获取此学生某单科目的成绩
         /// </summary>
         /// <param name="stu">学生</param>
         /// <returns>成绩</returns>
-        public double? GetScoreOfThisStudent(Student stu) => stu[TeachingRange];
+        public Double? GetScoreOfThisStudent(Student stu) => stu[TeachingRange];
         /// <summary>
         /// 显示学生成绩列表
         /// </summary>
@@ -80,19 +80,30 @@ namespace Sebastien.ClassManager.Core
             uint row = 1;
             foreach (var index in InformationLibrary.StudentLibrary)
             {
+                if (row % 2 == 1)
+                {
+                    BackgroundColor = ConsoleColor.White;
+                    ForegroundColor = ConsoleColor.Black;
+                }
+                else
+                {
+                    BackgroundColor = ConsoleColor.Black;
+                    ForegroundColor = ConsoleColor.White;
+                }
                 if (IsDisplayRank == State.on)
                 {
                     Write($"{row++} ");
                 }
                 WriteLine($"{index.Name, -10} {index[TeachingRange]}");
             }
+            UI.DefaultColor();
         }
         /// <summary>
         /// 显示此分数以上的所有学生
         /// </summary>
         /// <param name="score">指定分数</param>
         /// <exception cref="ArgumentOutOfRangeException">score大于100或者小于0时引发此异常</exception>
-        public void GetStuHighThan(int score)
+        public void GetStuHighThan(Int32 score)
         {
             try
             {

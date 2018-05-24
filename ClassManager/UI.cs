@@ -1,9 +1,10 @@
 ﻿using System;
-using MySelector;
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -12,6 +13,14 @@ namespace Sebastien.ClassManager.Core
     /// </summary>
     public static class UI
     {
+        /// <summary>
+        /// 同步锁
+        /// </summary>
+        private static readonly Object localLock = new Object();
+        /// <summary>
+        /// 任务取消令牌
+        /// </summary>
+        public static CancellationTokenSource _cts = new CancellationTokenSource();
         #region 用户，学生，教师， 班主任类的扩展方法
         /// <summary>
         /// 获取帮助(指定用户)
@@ -91,7 +100,40 @@ namespace Sebastien.ClassManager.Core
             WriteLine("ReleaseNewCurriculum: 发布新课表");
             WriteLine("ReleaseAMsg: 广播一条消息");
         }
+        
+        /// <summary>
+        /// 用户选择界面(未实现)
+        /// </summary>
+        /// <returns></returns>
+        public static void TheSelectOfUser()
+        {
+            BackgroundColor = ConsoleColor.Green;
+            ForegroundColor = ConsoleColor.White;
+            Clear();
+            SetCursorPosition(50, 10);
+            WriteLine("Who are you?");
+            dynamic dm = Client.GetSelectorObject<Identity>(
+                new List<String>
+                {
+                    "Student",
+                    "Teacher",
+                    "HeadTeacher"
+                },
+                new Identity[]
+                {
+                    Identity.Student,
+                    Identity.Instructor,
+                    Identity.HeadTeacher
+                }
+                );
+            dm.UnselectedBackground = BackgroundColor;
+            dm.UnselectedForeground = ForegroundColor;
 
+            Identity result = dm.GetSelect();
+            Clear();
+            WriteLine($"your selector: {result}");
+            ReadKey();
+        }
         /// <summary>
         /// 显示命令提示符
         /// </summary>
@@ -150,6 +192,74 @@ namespace Sebastien.ClassManager.Core
                     WriteLine($"晚上好，{me.Name}~");
                     WriteLine("天很晚了，早点休息");
                     break;
+            }
+        }
+        /// <summary>
+        /// 显示学生列表
+        /// </summary>
+        /// <param name="info">所有学生信息</param>
+        public static void DisplayStudentList(this User me)
+        {
+            if (InformationLibrary.StudentLibrary.Count > 0)
+            {
+                Boolean IsWhite = true;
+                WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10}");
+                Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
+                {
+                    lock (localLock)
+                    {
+                        if (IsWhite)
+                        {
+                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.White, ConsoleColor.Black);
+                            WriteLine();
+                            IsWhite = false;
+                        }
+                        else
+                        {
+                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.Black, ConsoleColor.White);
+                            WriteLine();
+                            IsWhite = true;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                UI.DisplayTheInformationOfErrorCode(ErrorCode.NoDisplayableInformation);
+            }
+        }
+        /// <summary>
+        /// 显示教师列表
+        /// </summary>
+        /// <param name="info">所有教师信息</param>
+        public static void DisplayTeacherList(this User me)
+        {
+            if (InformationLibrary.TeacherLibrary.Count > 0)
+            {
+                Boolean IsWhite = true;
+                WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10} {"Since",-10}");
+                Parallel.ForEach(InformationLibrary.TeacherLibrary, teacher =>
+                {
+                    lock (localLock)
+                    {
+                        if (IsWhite)
+                        {
+                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.White, ConsoleColor.Black);
+                            WriteLine();
+                            IsWhite = false;
+                        }
+                        else
+                        {
+                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.Black, ConsoleColor.White);
+                            WriteLine();
+                            IsWhite = true;
+                        }
+                    }
+                });
+            }
+            else
+            {
+                UI.DisplayTheInformationOfErrorCode(ErrorCode.NoDisplayableInformation);
             }
         }
         /// <summary>
@@ -258,9 +368,9 @@ namespace Sebastien.ClassManager.Core
         /// <param name="me">当前用户</param>
         public static void ViewMyHistory(this User me)
         {
-            foreach (var index in me.GetHistory())
+            for(var historyIndex = me.GetHistory().Count - 1; historyIndex >= 0; --historyIndex)
             {
-                WriteLine(index);
+                WriteLine(me.GetHistory()[historyIndex]);
             }
         }
         /// <summary>

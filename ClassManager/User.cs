@@ -3,6 +3,8 @@ using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 using System.Threading.Tasks;
+using System.Threading;
+
 
 namespace Sebastien.ClassManager.Core
 {
@@ -79,9 +81,9 @@ namespace Sebastien.ClassManager.Core
         }
 
         /// <summary>
-        /// 同步锁
+        /// 登录计时任务取消令牌
         /// </summary>
-        private static readonly Object localLock = default(Int32);
+        private CancellationTokenSource _cts = default(CancellationTokenSource);
 
         /// <summary>
         /// 账号
@@ -136,72 +138,66 @@ namespace Sebastien.ClassManager.Core
         protected List<Message> History { get; set; } = new List<Message>();
 
         /// <summary>
-        /// 显示学生列表
+        /// 注销登录
         /// </summary>
-        /// <param name="info">所有学生信息</param>
-        public void DisplayStudentList()
+        public void LogOut()
         {
-            if (InformationLibrary.StudentLibrary.Count > 0)
+            _cts?.Cancel();
+        }
+        /// <summary>
+        /// 登录计时
+        /// </summary>
+        public async void LongRunning()
+        {
+            _cts = new CancellationTokenSource();
+            Int32 time = 0;
+            try
             {
-                Boolean IsWhite = true;
-                WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10}");
-                Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
+                Task t = new Task(() =>
                 {
-                    lock(localLock)
+                    while (true)
                     {
-                        if (IsWhite)
+                        if (_cts.IsCancellationRequested)
                         {
-                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.White, ConsoleColor.Black);
-                            WriteLine();
-                            IsWhite = false;
+                            throw new TaskCanceledException();
                         }
-                        else
-                        {
-                            UI.PrintColorMsg($"{stu.Name,-10} {stu.Sex,-10} {stu.Age,-10}", ConsoleColor.Black, ConsoleColor.White);
-                            WriteLine();
-                            IsWhite = true;
-                        }
+                        Task.Delay(1000).Wait();
+                        ++time;
                     }
-                });
+                }, TaskCreationOptions.LongRunning);
+                t.Start();
+                await t;
             }
-            else
+            catch(TaskCanceledException)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.NoDisplayableInformation);
+                AddHistory(new Message("此次上线时间", $"[{time}]秒"));
             }
         }
         /// <summary>
-        /// 显示教师列表
+        /// 登录
         /// </summary>
-        /// <param name="info">所有教师信息</param>
-        public void DisplayTeacherList()
+        /// <returns>User: sucessfully, null: faild</returns>
+        public static User Login()
         {
-            if (InformationLibrary.TeacherLibrary.Count > 0)
+            User user = null;
+            while (true)
             {
-                Boolean IsWhite = true;
-                WriteLine($"{"Name",-10} {"Sex",-10} {"Age",-10} {"Since",-10}");
-                Parallel.ForEach(InformationLibrary.TeacherLibrary, teacher =>
+                user = Client.IdentityCheck(UI.GetInformationForLogin());
+                if (user == null)
                 {
-                    lock (localLock)
-                    {
-                        if (IsWhite)
-                        {
-                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.White, ConsoleColor.Black);
-                            WriteLine();
-                            IsWhite = false;
-                        }
-                        else
-                        {
-                            UI.PrintColorMsg($"{teacher.Name,-10} {teacher.Sex,-10} {teacher.Age,-10} {teacher.YearsOfProfessional,-10}", ConsoleColor.Black, ConsoleColor.White);
-                            WriteLine();
-                            IsWhite = true;
-                        }
-                    }
-                });
+                    UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
+                }
+                else
+                {
+                    UI.DisplayTheInformationOfSuccessfully("(登录成功)");
+                    Title = $"Student Manager Studio to [{user.Name}]";
+                    user.SayHello();
+                    user.AddHistory(new Message("登录操作", "状态: 登录成功"));
+                    user.LongRunning();
+                    break;
+                }
             }
-            else
-            {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.NoDisplayableInformation);
-            }
+            return user;
         }
         /// <summary>
         /// 查看班主任信息

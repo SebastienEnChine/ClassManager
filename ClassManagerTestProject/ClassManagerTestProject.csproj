@@ -38,8 +38,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ClassManager.EnumsLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ClassManager.EnumsLib">
       <HintPath>..\ClassManager.EnumsLib\bin\Debug\ClassManager.EnumsLib.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -48,26 +47,22 @@
     <Reference Include="Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\MSTest.TestFramework.1.2.1\lib\net45\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll</HintPath>
     </Reference>
-    <Reference Include="SelectorLib, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\SelectorLib\bin\Debug\SelectorLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
-    <Compile Include="Curriculum.cs" />
-    <Compile Include="HeadTeacher.cs" />
-    <Compile Include="InformationLibrary.cs" />
-    <Compile Include="Instructor.cs" />
-    <Compile Include="ITeacher.cs" />
-    <Compile Include="Message.cs" />
-    <Compile Include="Student.cs" />
-    <Compile Include="Teacher.cs" />
-    <Compile Include="UI.cs" />
+    <Compile Include="ClientTest.cs" />
+    <Compile Include="CurriculumTest.cs" />
+    <Compile Include="HeadTeacherTest.cs" />
+    <Compile Include="InformationLibraryTest.cs" />
+    <Compile Include="InstructorTest.cs" />
+    <Compile Include="ITeacherTest.cs" />
+    <Compile Include="MessageTest.cs" />
+    <Compile Include="StudentTest.cs" />
+    <Compile Include="TeacherTest.cs" />
+    <Compile Include="UITest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="User.cs" />
+    <Compile Include="UserTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 using System.Threading.Tasks;
 using System.Threading;
-
+using System.Diagnostics;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -84,7 +84,7 @@ namespace Sebastien.ClassManager.Core
         /// 登录计时任务取消令牌
         /// </summary>
         private CancellationTokenSource _cts = default(CancellationTokenSource);
-
+        private Stopwatch _sw = default(Stopwatch);
         /// <summary>
         /// 账号
         /// </summary>
@@ -150,7 +150,8 @@ namespace Sebastien.ClassManager.Core
         public async void LongRunning()
         {
             _cts = new CancellationTokenSource();
-            Int32 time = 0;
+            _sw = new Stopwatch();
+            _sw.Start();
             try
             {
                 Task t = new Task(() =>
@@ -159,18 +160,20 @@ namespace Sebastien.ClassManager.Core
                     {
                         if (_cts.IsCancellationRequested)
                         {
+                            _sw.Stop();
+                            _cts = null;
                             throw new TaskCanceledException();
                         }
-                        Task.Delay(1000).Wait();
-                        ++time;
                     }
                 }, TaskCreationOptions.LongRunning);
                 t.Start();
                 await t;
             }
-            catch(TaskCanceledException)
+            catch (TaskCanceledException)
             {
-                AddHistory(new Message("此次上线时间", $"[{time}]秒"));
+                TimeSpan ts = _sw.Elapsed;
+                _sw = null;
+                AddHistory(new Message("此次上线时间", $"[{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}]"));
             }
         }
         /// <summary>
@@ -179,23 +182,30 @@ namespace Sebastien.ClassManager.Core
         /// <returns>User: sucessfully, null: faild</returns>
         public static User Login()
         {
-            User user = null;
-            while (true)
+            User user = Client.IdentityCheck(UI.GetInformationForLogin());
+            if (user == null)
             {
-                user = Client.IdentityCheck(UI.GetInformationForLogin());
-                if (user == null)
-                {
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
-                }
-                else
-                {
-                    UI.DisplayTheInformationOfSuccessfully("(登录成功)");
-                    Title = $"Student Manager Studio to [{user.Name}]";
-                    user.SayHello();
-                    user.AddHistory(new Message("登录操作", "状态: 登录成功"));
-                    user.LongRunning();
-                    break;
-                }
+                UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
+            }
+            else
+            {
+                UI.DisplayTheInformationOfSuccessfully("(登录成功)");
+                Title = $"Student Manager Studio to [{user.Name}]";
+                user.SayHello();
+                user.AddHistory(new Message("登录操作", "登录成功"));
+                user.LongRunning();
+            }
+            return user;
+        }
+        /// <summary>
+        /// 切换用户
+        /// </summary>
+        public User SwitchUser()
+        {
+            User user = Login();
+            if (user != null)
+            {
+                LogOut();
             }
             return user;
         }

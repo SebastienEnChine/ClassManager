@@ -54,7 +54,7 @@ namespace Sebastien.ClassManager.Core
         public DateTime OverTime { get; }
         /// <summary>
         /// 课表内容
-        /// </summary>
+        /// </summary> 
         private CurriculumContant[,] _lessons;
         /// <summary>
         /// 课表内容

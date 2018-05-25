@@ -35,9 +35,6 @@
     <Reference Include="ClassManager.EnumsLib">
       <HintPath>..\ClassManager.EnumsLib\bin\Debug\ClassManager.EnumsLib.dll</HintPath>
     </Reference>
-    <Reference Include="SelectorLib">
-      <HintPath>..\SelectorLib\bin\Debug\SelectorLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

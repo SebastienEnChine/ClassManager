@@ -43,7 +43,11 @@ namespace Sebastien.ClassManager.Core
             UI.DefaultSetting();
             UI.AboutThisApplication();
 
-            User currentUser = Login();
+            User currentUser;
+            do
+            {
+                currentUser = User.Login();
+            } while (currentUser == null);
 
             while (ApplicationState == State.on)
             {
@@ -64,36 +68,14 @@ namespace Sebastien.ClassManager.Core
                 }
             }
         }
-        /// <summary>
-        /// 登录
-        /// </summary>
-        /// <returns>User: sucessfully, null: faild</returns>
-        public static User Login()
-        {
-            User user = null;
-            while (true)
-            {
-                user = IdentityCheck(UI.GetInformationForLogin());
-                if (user == null)
-                {
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
-                }
-                else
-                {
-                    UI.DisplayTheInformationOfSuccessfully("(登录成功)");
-                    user.SayHello();
-                    break;
-                }
-            }
-            return user;
-        }
+
         /// <summary>
         /// 加载选择器
         /// </summary>
         /// <returns>选择器对象</returns>
         public static Object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
         {
-            Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\ClassManager\bin\Debug\SelectorLib.dll");
+            Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\SelectorLib\bin\Debug\SelectorLib.dll");
             Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
             Type fullTypeName = coreTypeName.MakeGenericType(typeof(T));
             Object[] paras = { info, selects };
@@ -128,16 +110,7 @@ namespace Sebastien.ClassManager.Core
                     currentUser.GetHelp();
                     break;
                 case Command.SwitchUser:
-                    user = IdentityCheck(UI.GetInformationForLogin());
-                    if (user == null)
-                    {
-                        UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
-                    }
-                    else
-                    {
-                        UI.DisplayTheInformationOfSuccessfully("(登录成功)");
-                        user.SayHello();
-                    }
+                    user = currentUser.SwitchUser();
                     break;
                 case Command.ShowMe:
                     currentUser.ViewPersonalInformation();
@@ -164,6 +137,7 @@ namespace Sebastien.ClassManager.Core
                     user.ViewTheInformationOfTheHeadteacher();
                     break;
                 case Command.Exit:
+                    currentUser.LogOut();
                     ApplicationState = State.off;
                     break;
                 default:
@@ -469,9 +443,16 @@ namespace Sebastien.ClassManager.Core
         public static User IdentityCheck(Tuple<String, String> LoginInformation)
         {
             User result = CheckAccountAvailability(LoginInformation.Item1);
-            if ((result != null) && LoginInformation.Item2.Equals(result.Passwd))
+            if (result != null)
             {
-                return result;
+                if (LoginInformation.Item2.Equals(result.Passwd))
+                {
+                    return result;
+                }
+                else
+                {
+                    result.AddHistory(new Message("登录操作", "登录失败"));
+                }
             }
             return null;
         }

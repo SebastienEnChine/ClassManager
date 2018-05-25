@@ -71,9 +71,7 @@ namespace MySelector
         /// <summary>
         /// 选中项索引
         /// </summary>
-        private 
-            
-            _mainIndex = 0;
+        private Int32 _mainIndex = 0;
 
         /// <summary>
         /// 构造函数
@@ -101,7 +99,7 @@ namespace MySelector
         /// 显示选项信息并获取用户的选择
         /// </summary>
         /// <returns>用户的选择结果</returns>
-        public T GetSubject()
+        public T GetSelect()
         {
             //保存控制台原有颜色
             ConsoleColor oldbg = BackgroundColor;
@@ -147,7 +145,7 @@ namespace MySelector
                 if (_mainIndex == index)
                 {
                     SetSelectColor();
-                    Write($"{" ==>",-10}{TheInfomationOfSelect[index]}");
+                    Write($"{"",-10}{TheInfomationOfSelect[index]}");
                     SetColor();
                     WriteLine(".");
                 }

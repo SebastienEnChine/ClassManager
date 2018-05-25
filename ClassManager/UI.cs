@@ -356,7 +356,7 @@ namespace Sebastien.ClassManager.Core
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
             dynamic dm = Client.GetSelectorObject(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame);
-            TheSex result = dm.GetSubject();
+            TheSex result = dm.GetSelect();
             //不使用动态加载
             //TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
             me.AddHistory(new Message("你", $"重新设置了性别({me.Sex = result})"));
@@ -643,7 +643,7 @@ namespace Sebastien.ClassManager.Core
                                                  Subject.Java,
                                                  Subject.SQL
                                           }) ?? throw new NullReferenceException();
-            Subject result = dm.GetSubject();
+            Subject result = dm.GetSelect();
             Write("账号: ");
             String account = ReadLine();
             if (account.Contains(" ") || account.Equals(String.Empty))

@@ -112,19 +112,19 @@ namespace Sebastien.ClassManager.Core
                 {
                     PrintMsg(_lessons[line, row].Person, _lessons[line, row].CurriculumColor);
                 }
-                WriteLine(".");
+                //WriteLine(".");
                 UI.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
                 for (Int32 line = 0; line < Week; ++line)
                 {
                     PrintMsg(_lessons[line, row].Theme, _lessons[line, row].CurriculumColor);
                 }
-                WriteLine(".");
+                //WriteLine(".");
                 UI.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
                 for (Int32 line = 0; line < Week; ++line)
                 {
                     PrintMsg(_lessons[line, row].CurriculumColor.ToString(), _lessons[line, row].CurriculumColor);
                 }
-                WriteLine(".");
+                //WriteLine(".");
             }
         }
         /// <summary>

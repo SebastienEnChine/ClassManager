@@ -5,15 +5,14 @@ using System.Collections;
 using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
+using System.Windows;
 
 namespace Sebastien.ClassManager.Core
 {
-    
-
     /// <summary>
     /// 学生用户类
     /// </summary>
-    public sealed class Student : User, IComparable, IComparable<Student>, IFormattable, IEnumerable
+    public sealed class Student : User, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
     {
         /// <summary>
         /// 成绩
@@ -66,7 +65,6 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public Student()
         {
-
         }
         /// <summary>
         /// 复制构造函数
@@ -118,7 +116,7 @@ namespace Sebastien.ClassManager.Core
             {
                 await Task.Run(() =>
                 {
-                    teacher.NewMsg += ReceiveNewCurriculum;
+                    WeakEventManager<Teacher, Message>.AddHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum);
                     IsSubscription = true;
                 });
                 UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
@@ -135,8 +133,12 @@ namespace Sebastien.ClassManager.Core
             }
             else
             {
-                await Task.Run(() => teacher.NewMsg -= ReceiveNewCurriculum);
+                await Task.Run(() => 
+                        WeakEventManager<Teacher, Message>
+                        .RemoveHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum)
+                    );
                 UI.DisplayTheInformationOfSuccessfully("取消订阅成功");
+                IsSubscription = false;
             }
         }
         /// <summary>
@@ -181,6 +183,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sender"></param>
         /// <param name="c"></param>
         public void ReceiveNewCurriculum(Object sender, Message msg) => NewMsg.Enqueue(msg);
+
         /// <summary>
         /// 查看新消息
         /// </summary>
@@ -246,6 +249,18 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <returns></returns>
         public IEnumerator GetEnumerator() => new StudentIEnumerator(_score);
+        /// <summary>
+        /// 弱事件处理程序
+        /// </summary>
+        /// <param name="managerType"></param>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public Boolean ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
+        {
+            ReceiveNewCurriculum(sender, e as Message);
+            return true;
+        }
 
         /// <summary>
         /// 学生类枚举器

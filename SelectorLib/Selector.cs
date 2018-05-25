@@ -78,8 +78,8 @@ namespace MySelector
         /// </summary>
         /// <param name="info">选项显示信息</param>
         /// <param name="select">选项</param>
-        ///<exception cref="System.NullReferenceException">info或select为null时引发</exception>
-        ///<exception cref="SelectorException">info和select长度不匹配时引发</exception>
+        ///<exception cref="NullReferenceException">info或select为null时引发此异常</exception>
+        ///<exception cref="SelectorException">info和select长度不匹配时引发此异常</exception>
         public Selector(List<String> info, params T[] select)
         {
             if (info == null || select == null)

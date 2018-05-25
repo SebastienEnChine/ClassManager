@@ -7,7 +7,7 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 老师抽象基类
     /// </summary>
-    public class Teacher : User
+    public abstract class Teacher : User
     {
         /// <summary>
         /// 从业年份

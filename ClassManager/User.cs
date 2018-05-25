@@ -84,7 +84,11 @@ namespace Sebastien.ClassManager.Core
         /// 登录计时任务取消令牌
         /// </summary>
         private CancellationTokenSource _cts = default(CancellationTokenSource);
+        /// <summary>
+        /// 计时器
+        /// </summary>
         private Stopwatch _sw = default(Stopwatch);
+
         /// <summary>
         /// 账号
         /// </summary>
@@ -140,41 +144,43 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 注销登录
         /// </summary>
-        public void LogOut()
+        public void LogOut() => _cts?.Cancel();
+        /// <summary>
+        /// 登录计时(异常处理)
+        /// </summary>
+        public async void CallTimingAndException()
         {
-            _cts?.Cancel();
+            try
+            {
+                await Timing();
+            }
+            catch (TaskCanceledException)
+            {
+                AddHistory(new Message("此次上线时间", $"[{_sw.Elapsed.Hours:00}:{_sw.Elapsed.Minutes:00}:{_sw.Elapsed.Seconds:00}]"));
+            }
         }
         /// <summary>
-        /// 登录计时
+        /// 计时
         /// </summary>
-        public async void LongRunning()
+        /// <returns></returns>
+        private Task Timing()
         {
             _cts = new CancellationTokenSource();
             _sw = new Stopwatch();
             _sw.Start();
-            try
+            return new Task(() =>
             {
-                Task t = new Task(() =>
+                while (true)
                 {
-                    while (true)
+                    if (_cts.IsCancellationRequested)
                     {
-                        if (_cts.IsCancellationRequested)
-                        {
-                            _sw.Stop();
-                            _cts = null;
-                            throw new TaskCanceledException();
-                        }
+                        _sw.Stop();
+                        _cts = null;
+                        _sw = null;
+                        throw new TaskCanceledException();
                     }
-                }, TaskCreationOptions.LongRunning);
-                t.Start();
-                await t;
-            }
-            catch (TaskCanceledException)
-            {
-                TimeSpan ts = _sw.Elapsed;
-                _sw = null;
-                AddHistory(new Message("此次上线时间", $"[{ts.Hours:00}:{ts.Minutes:00}:{ts.Seconds:00}]"));
-            }
+                }
+            }, TaskCreationOptions.LongRunning);
         }
         /// <summary>
         /// 登录
@@ -193,7 +199,7 @@ namespace Sebastien.ClassManager.Core
                 Title = $"Student Manager Studio to [{user.Name}]";
                 user.SayHello();
                 user.AddHistory(new Message("登录操作", "登录成功"));
-                user.LongRunning();
+                user.CallTimingAndException();
             }
             return user;
         }

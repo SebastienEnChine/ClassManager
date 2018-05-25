@@ -5,6 +5,9 @@ namespace Sebastien.ClassManager.Core
 {
     public class Message : EventArgs
     {
+        /// <summary>
+        /// 消息来源
+        /// </summary>
         public String Source { get; }
         /// <summary>
         /// 时间

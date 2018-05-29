@@ -5,13 +5,14 @@ using Sebastien.ClassManager.Enums;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
+using System.Threading.Tasks.Dataflow;
 
 namespace Sebastien.ClassManager.Core
 {
     /// <summary>
     /// 用于查找用户账号是否重复
     /// </summary>
-    class FindAccount<T> where T : User
+    public class FindAccount<T> where T : User
     {
         /// <summary>
         /// 账号
@@ -37,31 +38,35 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 默认构造函数
         /// </summary>
-        public User()
+        protected User()
         {
         }
+        /// <inheritdoc />
         /// <summary>
         /// 复制构造函数
         /// </summary>
         /// <param name="user">用户对象</param>
-        public User(User user)
+        protected User(User user)
             : this(user.Account, user.Passwd, user.Name, user.Sex, user.Age, user.Address, user.UserType)
         {
             //. . . 
         }
+
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
+        /// <param name="name"></param>
         /// <param name="userType">用户类型</param>
-        public User(String account, String passwd, String name, Identity userType)
+        protected User(String account, String passwd, String name, Identity userType)
         {
             Account = account;
             Passwd = passwd;
             Name = name;
             UserType = userType;
         }
+        /// <inheritdoc />
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -72,7 +77,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public User(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType)
+        protected User(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType)
             : this(account, passwd, name, userType)
         {
             Sex = sex;
@@ -84,6 +89,10 @@ namespace Sebastien.ClassManager.Core
         /// 登录计时任务取消令牌
         /// </summary>
         private CancellationTokenSource _cts = default(CancellationTokenSource);
+        /// <summary>
+        /// 登录管道输出
+        /// </summary>
+        public static readonly BufferBlock<User> Result = new BufferBlock<User>();
         /// <summary>
         /// 计时器
         /// </summary>
@@ -100,7 +109,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 用户类型
         /// </summary>
-        public Identity UserType { get; set; }
+        public Identity UserType { get; }
         /// <summary>
         /// 创建时间
         /// </summary>
@@ -116,13 +125,10 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 年龄
         /// </summary>
-        protected Int32 _age;
+        private Int32 _age;
         public Int32 Age
         {
-            get
-            {
-                return _age;
-            }
+            get => _age;
             set
             {
                 if (value > 100 || value < 10)
@@ -135,11 +141,11 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 地址
         /// </summary>
-        public String Address { get; set; }
+        public String Address { private get; set; }
         /// <summary>
         /// 操作记录
         /// </summary>
-        protected List<Message> History { get; set; } = new List<Message>();
+        private List<Message> History { get; } = new List<Message>();
 
         /// <summary>
         /// 注销登录
@@ -148,13 +154,13 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 登录计时(异常处理)
         /// </summary>
-        public async void CallTimingAndException()
+        private async void CallTimingAndException()
         {
             try
             {
                 await Timing();
             }
-            catch (TaskCanceledException)
+            catch (OperationCanceledException)
             {
                 AddHistory(new Message("此次上线时间", $"[{_sw.Elapsed.Hours:00}:{_sw.Elapsed.Minutes:00}:{_sw.Elapsed.Seconds:00}]"));
             }
@@ -171,16 +177,29 @@ namespace Sebastien.ClassManager.Core
             return new Task(() =>
             {
                 while (true)
-                {
+                 {
                     if (_cts.IsCancellationRequested)
                     {
                         _sw.Stop();
                         _cts = null;
                         _sw = null;
-                        throw new TaskCanceledException();
+                        throw new OperationCanceledException();
                     }
-                }
+                    //_cts.Token.ThrowIfCancellationRequested();
+                 }
             }, TaskCreationOptions.LongRunning);
+        }
+        /// <summary>
+        /// 登录动作管道
+        /// </summary>
+        public static ITargetBlock<Func<Tuple<String, String>>> LoginWithBlock()
+        {
+            var loginInfo = new TransformBlock<Func<Tuple<String, String>>, Tuple<String, String>>(info => info?.Invoke());
+            var isAUser = new TransformBlock<Tuple<String, String>, User>(info => Client.IdentityCheck(info));
+
+            loginInfo.LinkTo(isAUser);
+            isAUser.LinkTo(Result);
+            return loginInfo;
         }
         /// <summary>
         /// 登录
@@ -188,14 +207,17 @@ namespace Sebastien.ClassManager.Core
         /// <returns>User: sucessfully, null: faild</returns>
         public static User Login()
         {
-            User user = Client.IdentityCheck(UI.GetInformationForLogin());
+            ITargetBlock<Func<Tuple<String, String>>> result = LoginWithBlock();
+            result.Post(Ui.GetInformationForLogin);
+            User user = Result.Receive();
+            //User user = Client.IdentityCheck(UI.GetInformationForLogin());
             if (user == null)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.AccountOrPasswdError);
             }
             else
             {
-                UI.DisplayTheInformationOfSuccessfully("(登录成功)");
+                Ui.DisplayTheInformationOfSuccessfully("(登录成功)");
                 Title = $"Student Manager Studio to [{user.Name}]";
                 user.SayHello();
                 user.AddHistory(new Message("登录操作", "登录成功"));

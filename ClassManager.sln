@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelectorLibTestProject", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayInfo", "DisplayInfo\DisplayInfo.csproj", "{F9D30314-655B-4D2F-95B6-E5F366806EBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassManagerTests", "ClassManagerTests\ClassManagerTests.csproj", "{6620D901-3165-4E04-A277-E341AFEC3819}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{F9D30314-655B-4D2F-95B6-E5F366806EBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9D30314-655B-4D2F-95B6-E5F366806EBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9D30314-655B-4D2F-95B6-E5F366806EBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6620D901-3165-4E04-A277-E341AFEC3819}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6620D901-3165-4E04-A277-E341AFEC3819}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6620D901-3165-4E04-A277-E341AFEC3819}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6620D901-3165-4E04-A277-E341AFEC3819}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

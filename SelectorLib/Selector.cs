@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using static System.Console;
 
 namespace MySelector
 {
+    /// <inheritdoc />
     /// <summary>
     /// 选择器异常类
     /// </summary>
     public class SelectorException : Exception
     {
+        /// <inheritdoc />
         /// <summary>
         /// 默认构造函数
         /// </summary>
@@ -71,7 +72,7 @@ namespace MySelector
         /// <summary>
         /// 选中项索引
         /// </summary>
-        private Int32 _mainIndex = 0;
+        private Int32 _mainIndex;
 
         /// <summary>
         /// 构造函数
@@ -90,7 +91,6 @@ namespace MySelector
             {
                 throw new SelectorException();
             }
-
             Select = select.ToImmutableList();
             TheInfomationOfSelect = info.ToImmutableList();
         }
@@ -102,13 +102,13 @@ namespace MySelector
         public T GetSelect()
         {
             //保存控制台原有颜色
-            ConsoleColor oldbg = BackgroundColor;
-            ConsoleColor oldfg = ForegroundColor;
+            ConsoleColor oldbg = Console.BackgroundColor;
+            ConsoleColor oldfg = Console.ForegroundColor;
 
             do
             {
                 DisplayTheInfomationOfSelect();
-                ConsoleKeyInfo info = ReadKey(true);
+                ConsoleKeyInfo info = Console.ReadKey(true);
                 switch (info.Key)
                 {
                     case ConsoleKey.UpArrow:
@@ -125,14 +125,15 @@ namespace MySelector
                         break;
                     case ConsoleKey.Enter:
                         //恢复控制台原有颜色
-                        BackgroundColor = oldbg;
-                        ForegroundColor = oldfg;
+                        Console.BackgroundColor = oldbg;
+                        Console.ForegroundColor = oldfg;
 
                         return Select[_mainIndex];
                     default:
                         break;
                 }
-                SetCursorPosition(0, CursorTop - Select.Count);
+
+                Console.SetCursorPosition(0, Console.CursorTop - Select.Count);
             } while (true);
         }
         /// <summary>
@@ -145,27 +146,27 @@ namespace MySelector
                 if (_mainIndex == index)
                 {
                     SetSelectColor();
-                    Write($"{"",-10}{TheInfomationOfSelect[index]}");
+                    Console.Write($"{"",-10}{TheInfomationOfSelect[index]}");
                     SetColor();
-                    WriteLine(".");
+                    Console.WriteLine(".");
                 }
                 else
                 {
-                    WriteLine($"{" ",-10}{TheInfomationOfSelect[index]}");
+                    Console.WriteLine($"{" ",-10}{TheInfomationOfSelect[index]}");
                 }
             }
 
             //默认颜色设置
             void SetColor()
             {
-                BackgroundColor = UnselectedBackground;
-                ForegroundColor = UnselectedForeground;
+                Console.BackgroundColor = UnselectedBackground;
+                Console.ForegroundColor = UnselectedForeground;
             }
             //焦点颜色设置
             void SetSelectColor()
             {
-                BackgroundColor = SelectedBackground;
-                ForegroundColor = SelectedForeground;
+                Console.BackgroundColor = SelectedBackground;
+                Console.ForegroundColor = SelectedForeground;
             }
         }
     }

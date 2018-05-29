@@ -22,7 +22,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 课表信息
         /// </summary>
-        public static Curriculum[] _curriculums = new Curriculum[2];
+        public static readonly Curriculum[] _curriculums = new Curriculum[2];
         //public static Queue<Curriculum> Curriculums = new Queue<Curriculum>(2);
     }
 }

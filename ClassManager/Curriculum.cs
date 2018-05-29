@@ -52,17 +52,19 @@ namespace Sebastien.ClassManager.Core
         /// 失效时间
         /// </summary>
         public DateTime OverTime { get; }
-        /// <summary>
-        /// 课表内容
-        /// </summary> 
+#pragma warning disable IDE0044 // 添加只读修饰符
+                               /// <summary>
+                               /// 课表内容
+                               /// </summary> 
         private CurriculumContant[,] _lessons;
-        /// <summary>
-        /// 课表内容
-        /// </summary>
-        /// <param name="days">节索引</param>
-        /// <param name="classes">天数索引</param>
-        /// <returns>课程内容</returns>
-        /// <exception cref="ArgumentOutOfRangeException">days小于0或大于6时引发, classes小于0或大于2时引发</exception>
+#pragma warning restore IDE0044 // 添加只读修饰符
+                               /// <summary>
+                               /// 课表内容
+                               /// </summary>
+                               /// <param name="days">节索引</param>
+                               /// <param name="classes">天数索引</param>
+                               /// <returns>课程内容</returns>
+                               /// <exception cref="ArgumentOutOfRangeException">days小于0或大于6时引发, classes小于0或大于2时引发</exception>
         public CurriculumContant this[Int32 days, Int32 classes]
         {
             get
@@ -91,7 +93,7 @@ namespace Sebastien.ClassManager.Core
             DateTime temp = DateTime.Now.AddDays(DateTime.Now.DayOfWeek == DayOfWeek.Sunday ? 0 : 7 - (Int32)DateTime.Now.DayOfWeek);
             if (InformationLibrary._curriculums[0] != null)
             {
-                temp.AddDays(7);
+                temp = temp.AddDays(7);
             }
             OverTime = new DateTime(temp.Year, temp.Month, temp.Day, 23, 59, 59);
             _lessons = new CurriculumContant[Week, Classes];
@@ -102,29 +104,29 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public void Draw()
         {
-            UI.PrintColorMsg($"{"", -6}{"Mon",-15}{"Tue",-15}{"Wen",-15}{"Thu",-15}{"Fri",-15}{"Sat",-15}{"Sun",-15}", ConsoleColor.White, ConsoleColor.Black);
+            Ui.PrintColorMsg($"{"", -6}{"Mon",-15}{"Tue",-15}{"Wen",-15}{"Thu",-15}{"Fri",-15}{"Sat",-15}{"Sun",-15}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine(".");
             for (Int32 row = 0; row < Classes; ++row)
             {
-                UI.PrintColorMsg(row == 0 ? "上午" : (row == 1 ? "下午" : "晚上"), ConsoleColor.White, ConsoleColor.Black);
-                UI.PrintColorMsg($"{" ",-2}", ConsoleColor.White, ConsoleColor.Black);
+                Ui.PrintColorMsg(row == 0 ? "上午" : (row == 1 ? "下午" : "晚上"), ConsoleColor.White, ConsoleColor.Black);
+                Ui.PrintColorMsg($"{" ",-2}", ConsoleColor.White, ConsoleColor.Black);
                 for (Int32 line = 0; line < Week; ++line)
                 {
                     PrintMsg(_lessons[line, row].Person, _lessons[line, row].CurriculumColor);
                 }
-                //WriteLine(".");
-                UI.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
+                WriteLine(".");
+                Ui.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
                 for (Int32 line = 0; line < Week; ++line)
                 {
                     PrintMsg(_lessons[line, row].Theme, _lessons[line, row].CurriculumColor);
                 }
-                //WriteLine(".");
-                UI.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
+                WriteLine(".");
+                Ui.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
                 for (Int32 line = 0; line < Week; ++line)
                 {
                     PrintMsg(_lessons[line, row].CurriculumColor.ToString(), _lessons[line, row].CurriculumColor);
                 }
-                //WriteLine(".");
+                WriteLine(".");
             }
         }
         /// <summary>
@@ -137,7 +139,7 @@ namespace Sebastien.ClassManager.Core
             ForegroundColor = ConsoleColor.Black;
             BackgroundColor = cc;
             Write($"{msg,-15}");
-            UI.DefaultColor();
+            Ui.DefaultColor();
         }
     }
 }

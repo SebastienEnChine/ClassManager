@@ -3,6 +3,8 @@ using static System.Console;
 using Sebastien.ClassManager.Enums;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 #region 其他需求
 //其他: 
@@ -32,16 +34,17 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 程序状态
         /// </summary>
-        private static State ApplicationState { get; set; } = State.on;
+        private static State ApplicationState { get; set; } = State.On;
 
         /// <summary>
         /// 程序主逻辑
         /// </summary>
         /// <param name="args">命令行参数</param>
-        static void Main(String[] args)
+        private static void Main(String[] args)
         {
-            UI.DefaultSetting();
-            UI.AboutThisApplication();
+            Ui.AddStudents();
+            Ui.DefaultSetting();
+            Ui.AboutThisApplication();
 
             User currentUser;
             do
@@ -49,8 +52,8 @@ namespace Sebastien.ClassManager.Core
                 currentUser = User.Login();
             } while (currentUser == null);
 
-            while (ApplicationState == State.on)
-            {
+            while (ApplicationState == State.On)
+             {
                 currentUser.Prompt();
                 switch (currentUser.UserType)
                 {
@@ -66,7 +69,7 @@ namespace Sebastien.ClassManager.Core
                     default:
                         throw new ArgumentException();
                 }
-            }
+             }
         }
 
         /// <summary>
@@ -78,22 +81,24 @@ namespace Sebastien.ClassManager.Core
             Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\SelectorLib\bin\Debug\SelectorLib.dll");
             Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
             Type fullTypeName = coreTypeName.MakeGenericType(typeof(T));
-            Object[] paras = { info, selects };
-            return asm.CreateInstance(fullTypeName.FullName, true, BindingFlags.Default, null, paras, null, null);
+            return asm.CreateInstance(fullTypeName.FullName ?? throw new InvalidOperationException(), true, BindingFlags.Default, null, new Object[] { info, selects }, null, null);
         }
+
         /// <summary>
         /// 获取由用户输入的命令
         /// </summary>
+        /// <param name="input" />
         /// <param name="cmd">命令参数</param>
         /// <returns></returns>
         public static String GetCmd(String input, out Command cmd)
         {
-            if (!Enum.TryParse(input, true, out cmd))
+            if (Enum.TryParse(input, true, out cmd))
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
-                return null;
+                return input;
             }
-            return input;
+
+            Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
+            return null;
         }
         /// <summary>
         /// 交互(针对于所有用户)
@@ -101,7 +106,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="currentUser">当前用户</param>
         /// <param name="cmd">可执行命令</param>
         /// <returns></returns>
-        public static User RunForUser(User currentUser, Command cmd)
+        private static User RunForUser(User currentUser, Command cmd)
         {
             User user = null;
             switch (cmd)
@@ -131,17 +136,17 @@ namespace Sebastien.ClassManager.Core
                     currentUser.ViewMyHistory();
                     break;
                 case Command.ViewCurriculums:
-                    user.ViewCurriculum();
+                    currentUser.ViewCurriculum();
                     break;
                 case Command.ViewHeadTeacher:
-                    user.ViewTheInformationOfTheHeadteacher();
+                    currentUser.ViewTheInformationOfTheHeadteacher();
                     break;
                 case Command.Exit:
                     currentUser.LogOut();
-                    ApplicationState = State.off;
+                    ApplicationState = State.Off;
                     break;
                 default:
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, cmd.ToString());
+                    Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, cmd.ToString());
                     break;
             }
             return user;
@@ -151,7 +156,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="stu">学生用户</param>
         /// <returns>用户对象</returns>
-        public static User RunForStudent(Student stu)
+        private static User RunForStudent(Student stu)
         {
             stu.TheTipsOfNews();
             ForegroundColor = ConsoleColor.Yellow;
@@ -192,7 +197,7 @@ namespace Sebastien.ClassManager.Core
                     stu.ShowMyScore();
                     break;
                 case Command.StudentsPreview:
-                    stu.DisplayStudentList();
+                    Ui.DisplayStudentList();
                     break;
                 case Command.TeachersPreview:
                     stu.DisplayTeacherList();
@@ -204,7 +209,7 @@ namespace Sebastien.ClassManager.Core
                     stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser);
                     break;
                 default:
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
+                    Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
                     break;
             }
             return result;
@@ -214,7 +219,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="headTeacher">班主任用户</param>
         /// <returns>用户对象</returns>
-        public static User RunForTeacher(Instructor teacher)
+        private static User RunForTeacher(Instructor teacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
             String input = ReadLine();
@@ -245,7 +250,7 @@ namespace Sebastien.ClassManager.Core
                     result = RunForUser(teacher, cmd);
                     break;
                 case Command.StudentsPreview:
-                    teacher.DisplayStudentList();
+                    Ui.DisplayStudentList();
                     break;
                 case Command.TeachersPreview:
                     teacher.DisplayTeacherList();
@@ -254,7 +259,7 @@ namespace Sebastien.ClassManager.Core
                     teacher.DisplayAllScoreOfStudent();
                     break;
                 case Command.AllScoreAndRank:
-                    teacher.DisplayAllScoreOfStudent(State.on, State.on);
+                    teacher.DisplayAllScoreOfStudent(State.On, State.On);
                     break;
                 case Command.ChangeScore:
                     teacher.CallChangeScore();
@@ -266,17 +271,18 @@ namespace Sebastien.ClassManager.Core
                     teacher.ReleaseNewMessage();
                     break;
                 default:
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
+                    Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
                     break;
             }
             return result;
         }
+
         /// <summary>
         /// 交互(班主任用户)
         /// </summary>
-        /// <param name="teacher"></param>
+        /// <param name="headTeacher"></param>
         /// <returns>用户对象</returns>
-        public static User RunForHeadTeacher(HeadTeacher headTeacher)
+        private static User RunForHeadTeacher(HeadTeacher headTeacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
             String input = ReadLine();
@@ -322,7 +328,7 @@ namespace Sebastien.ClassManager.Core
                     headTeacher.RemoveAccount();
                     break;
                 case Command.StudentsPreview:
-                    headTeacher.DisplayStudentList();
+                    Ui.DisplayStudentList();
                     break;
                 case Command.TeachersPreview:
                     headTeacher.DisplayTeacherList();
@@ -331,7 +337,7 @@ namespace Sebastien.ClassManager.Core
                     headTeacher.DisplayAllScoreOfStudent();
                     break;
                 case Command.AllScoreAndRank:
-                    headTeacher.DisplayAllScoreOfStudent(State.on, State.on);
+                    headTeacher.DisplayAllScoreOfStudent(State.On, State.On);
                     break;
                 case Command.HighThan:
                     headTeacher.DisplayScoreHighThan();
@@ -343,9 +349,12 @@ namespace Sebastien.ClassManager.Core
                     headTeacher.ReleaseNewMessage();
                     break;
                 default:
-                    UI.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
+                    Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
                     break;
             }
+
+
+
             return result;
         }
         /// <summary>
@@ -438,22 +447,21 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 检查登录信息
         /// </summary>
-        /// <param name="LoginInformation">登录信息</param>
+        /// <param name="loginInformation">登录信息</param>
         /// <returns>用户对象</returns>
-        public static User IdentityCheck(Tuple<String, String> LoginInformation)
+        public static User IdentityCheck(Tuple<string, String> loginInformation)
         {
-            User result = CheckAccountAvailability(LoginInformation.Item1);
-            if (result != null)
+            User result = CheckAccountAvailability(loginInformation.Item1);
+            if (result == null)
             {
-                if (LoginInformation.Item2.Equals(result.Passwd))
-                {
-                    return result;
-                }
-                else
-                {
-                    result.AddHistory(new Message("登录操作", "登录失败"));
-                }
+                return null;
             }
+
+            if (loginInformation.Item2.Equals(result.Passwd))
+            {
+                return result;
+            }
+            result.AddHistory(new Message("登录操作", "登录失败"));
             return null;
         }
         /// <summary>
@@ -487,10 +495,8 @@ namespace Sebastien.ClassManager.Core
                 }
                 else
                 {
-                    if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
-                    {
-                        InformationLibrary._curriculums[0] = null;
-                    }
+                    if (DateTime.Now <= InformationLibrary._curriculums[0].OverTime) return;
+                    InformationLibrary._curriculums[0] = null;
                 }
             }
         }

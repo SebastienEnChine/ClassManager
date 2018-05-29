@@ -69,9 +69,9 @@ namespace Sebastien.ClassManager.Core
         /// <param name="subject">科目</param>
         /// <param name="IsSort">是否排序</param>
         /// <param name="IsDisplayRank">是否显示行号</param>
-        public virtual void ViewScoreOfAllStudent(State IsSort = State.off, State IsDisplayRank = State.off)
+        public virtual void ViewScoreOfAllStudent(State IsSort = State.Off, State IsDisplayRank = State.Off)
         {
-            if (IsSort == State.on)
+            if (IsSort == State.On)
             {
                 //(依赖于Student.cs文件中的StudentCompare类)
                 //InformationLibrary.StudentLibrary.Sort(new Student.StudentCompare(TeachingRange));
@@ -90,14 +90,15 @@ namespace Sebastien.ClassManager.Core
                     BackgroundColor = ConsoleColor.Black;
                     ForegroundColor = ConsoleColor.White;
                 }
-                if (IsDisplayRank == State.on)
+                if (IsDisplayRank == State.On)
                 {
                     Write($"{row++} ");
                 }
                 WriteLine($"{index.Name, -10} {index[TeachingRange]}");
             }
-            UI.DefaultColor();
+            Ui.DefaultColor();
         }
+
         /// <summary>
         /// 显示此分数以上的所有学生
         /// </summary>
@@ -111,18 +112,19 @@ namespace Sebastien.ClassManager.Core
                 {
                     throw new ArgumentOutOfRangeException();
                 }
+
+                WriteLine($"{"Name",-10}Score");
                 IEnumerable<Student> result = from stu in InformationLibrary.StudentLibrary
-                                                                    where stu[TeachingRange] >= score
-                                                                    select stu;
-                WriteLine($"{"Name",-10}{"Score"}");
-                Parallel.ForEach(result, stu =>
+                                              where stu[TeachingRange] >= score
+                                              select stu;
+                Parallel.ForEach(result, student =>
                 {
-                    WriteLine($"{stu.Name,-10}{stu[TeachingRange],-10}");
+                    WriteLine($"{student.Name,-10}{student[TeachingRange],-10}");
                 });
             }
             catch(ArgumentOutOfRangeException)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.ArgumentOutOfRange);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.ArgumentOutOfRange);
             }
         }
     }

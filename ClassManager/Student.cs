@@ -6,18 +6,25 @@ using static System.Console;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 using System.Windows;
+using System.ComponentModel;
 
 namespace Sebastien.ClassManager.Core
 {
+    /// <inheritdoc />
     /// <summary>
     /// 学生用户类
     /// </summary>
-    public sealed class Student : User, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
+    public sealed class Student : User, INotifyPropertyChanged,  IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
     {
         /// <summary>
         /// 成绩
         /// </summary>
-        private Double?[] _score = new Double?[Enum.GetValues(typeof(Subject)).Length];
+        private readonly Double?[] _score = new Double?[Subject.C.GetLengthOfSubject()];
+        /// <summary>
+        /// 属性更改通知
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
         /// <summary>
         /// 成绩索引器
         /// </summary>
@@ -49,15 +56,15 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 新消息
         /// </summary>
-        public Queue<Message> NewMsg { get; private set; } = new Queue<Message>();
+        private Queue<Message> NewMsg { get; } = new Queue<Message>();
         /// <summary>
         /// 消息内容
         /// </summary>
-        public List<Message> AllNews { get; private set; } = new List<Message>();
+        private List<Message> AllNews { get; } = new List<Message>();
         /// <summary>
         /// 订阅状态
         /// </summary>
-        public Boolean IsSubscription { get; private set; } = false;
+        private Boolean IsSubscription { get; set; }
 
 
         /// <summary>
@@ -66,28 +73,32 @@ namespace Sebastien.ClassManager.Core
         public Student()
         {
         }
+
+        /// <inheritdoc />
         /// <summary>
         /// 复制构造函数
         /// </summary>
-        /// <param name="user">用户对象</param>
+        /// <param name="stu"></param>
         public Student(Student stu) : base(stu)
         {
             //TODO:
-            for (Int32 index = 0; index < _score.Length; ++index)
+            for (var index = 0; index < _score.Length; ++index)
             {
                 _score[index] = stu[(Subject)index];
             }
         }
+
+        /// <inheritdoc />
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
-        /// <param name="userType">用户类型</param>
         public Student(String account, String passwd, String name)
             : base(account, passwd, name, Identity.Student)
         {
         }
+        /// <inheritdoc />
         /// <summary>
         /// 构造函数
         /// </summary>
@@ -110,7 +121,7 @@ namespace Sebastien.ClassManager.Core
         {
             if (IsSubscription)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.DuplicateSubscriptions);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.DuplicateSubscriptions);
             }
             else
             {
@@ -119,7 +130,7 @@ namespace Sebastien.ClassManager.Core
                     WeakEventManager<Teacher, Message>.AddHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum);
                     IsSubscription = true;
                 });
-                UI.DisplayTheInformationOfSuccessfully("(订阅成功)");
+                Ui.DisplayTheInformationOfSuccessfully("(订阅成功)");
             }
         }
         /// <summary>
@@ -129,7 +140,7 @@ namespace Sebastien.ClassManager.Core
         {
             if (! IsSubscription)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
             }
             else
             {
@@ -137,7 +148,7 @@ namespace Sebastien.ClassManager.Core
                         WeakEventManager<Teacher, Message>
                         .RemoveHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum)
                     );
-                UI.DisplayTheInformationOfSuccessfully("取消订阅成功");
+                Ui.DisplayTheInformationOfSuccessfully("取消订阅成功");
                 IsSubscription = false;
             }
         }
@@ -177,12 +188,13 @@ namespace Sebastien.ClassManager.Core
             }
             WriteLine($"{GetTotalScore(),-10}");
         }
+
         /// <summary>
         /// 我的关注
         /// </summary>
         /// <param name="sender"></param>
-        /// <param name="c"></param>
-        public void ReceiveNewCurriculum(Object sender, Message msg) => NewMsg.Enqueue(msg);
+        /// <param name="msg"></param>
+        private void ReceiveNewCurriculum(Object sender, Message msg) => NewMsg.Enqueue(msg);
 
         /// <summary>
         /// 查看新消息
@@ -194,7 +206,7 @@ namespace Sebastien.ClassManager.Core
                 for (var index = 0; index < NewMsg.Count; ++index)
                 {
                     var msg = NewMsg.Dequeue();
-                    UI.PrintColorMsg(msg.ToString(), ConsoleColor.Black, ConsoleColor.DarkMagenta);
+                    Ui.PrintColorMsg(msg.ToString(), ConsoleColor.Black, ConsoleColor.DarkMagenta);
                     NewMsg.TrimExcess();
                     AllNews.Add(msg);
                     WriteLine();
@@ -244,11 +256,13 @@ namespace Sebastien.ClassManager.Core
             }
         }
         public String ToString(String format) => ToString(format, null);
+        /// <inheritdoc />
         /// <summary>
         /// 实现IEnumerable接口
         /// </summary>
         /// <returns></returns>
         public IEnumerator GetEnumerator() => new StudentIEnumerator(_score);
+        /// <inheritdoc />
         /// <summary>
         /// 弱事件处理程序
         /// </summary>
@@ -288,11 +302,13 @@ namespace Sebastien.ClassManager.Core
             /// 当前元素
             /// </summary>
             public Object Current => _iscore[_position];
+            /// <inheritdoc />
             /// <summary>
             /// 移动到下一元素
             /// </summary>
             /// <returns></returns>
-            public Boolean MoveNext() => (++_position >= _iscore.Length) ? false : true;
+            public Boolean MoveNext() => (++_position < _iscore.Length);
+            /// <inheritdoc />
             /// <summary>
             /// 重置当前元素
             /// </summary>
@@ -305,10 +321,11 @@ namespace Sebastien.ClassManager.Core
         public class StudentCompare : IComparer<Student>
         {
             /// <summary>
-            /// 排序方式
-            /// </summary>
-            private Subject _sortWay;
+                               /// 排序方式
+                               /// </summary>
+            private readonly Subject _sortWay;
             public StudentCompare(Subject sortWay) => _sortWay = sortWay;
+            /// <inheritdoc />
             /// <summary>
             /// 实现Compare方法
             /// </summary>

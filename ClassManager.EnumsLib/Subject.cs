@@ -24,7 +24,7 @@
         /// <summary>
         /// 数据库
         /// </summary>
-        SQL,
+        Sql,
         /// <summary>
         /// Html和Css
         /// </summary>

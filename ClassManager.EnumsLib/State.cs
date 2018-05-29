@@ -8,10 +8,10 @@
         /// <summary>
         /// 开
         /// </summary>
-        on, 
+        On, 
         /// <summary>
         /// 关
         /// </summary>
-        off
+        Off
     }
 }

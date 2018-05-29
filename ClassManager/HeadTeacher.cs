@@ -3,7 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using static System.Console;
 using System.Collections.Generic;
+using System.Threading;
 using Sebastien.ClassManager.Enums;
+// ReSharper disable All
 
 namespace Sebastien.ClassManager.Core
 {
@@ -13,49 +15,96 @@ namespace Sebastien.ClassManager.Core
     public sealed class HeadTeacher : Teacher, ITeacher
     {
         /// <summary>
+        /// 同步锁
+        /// </summary>
+        private static readonly Object SyncRoot = new Object();
+        /// <summary>
         /// 此类型唯一的实例对象
         /// </summary>
-        private static HeadTeacher _ht = null; //此类型唯一的实例对象
+        private static HeadTeacher _ht; //此类型唯一的实例对象
+        /// <inheritdoc />
         /// <summary>
         /// 默认构造函数
         /// </summary>
         private HeadTeacher() { }
+
+        /// <inheritdoc />
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
+        /// <param name="years"></param>
         /// <param name="userType">用户类型</param>
+        /// <param name="name"></param>
         private HeadTeacher(String account, String passwd, String name, Int32 years, Identity userType = Identity.HeadTeacher) 
             : base(account, passwd, name, years, userType)
         {
 
         }
-        
+
         /// <summary>
-        /// 限制HeadTeacher对象的唯一性
+        /// 单例模式( 线程安全 )
         /// </summary>
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
+        /// <param name="name"></param>
+        /// <param name="years"></param>
         /// <returns>如果HeadTeacher不为null，返回HeadTeacher对象， 否则创建一个新的HeadTeacher对象作为返回值</returns>
-        public static HeadTeacher GetHeadTeacher(String account, String passwd, String name, Int32 years) 
-            => _ht ?? ( _ht = new HeadTeacher(account, passwd, name, years));
+        public static HeadTeacher GetHeadTeacher(String account, String passwd, String name, Int32 years)
+        {
+            #region 一般实现
+            //if (_ht == null)
+            //{
+            //    lock (SyncRoot)
+            //    {
+            //        if (_ht == null)
+            //        {
+            //            _ht = new HeadTeacher(account, passwd, name, years);
+            //        }
+            //    }
+            //}
+            //return _ht;
+            #endregion
+
+            #region 使用NULL传播运算符
+            //if (_ht == null)
+            //{
+            //    lock (SyncRoot)
+            //    {
+            //        return _ht ?? new HeadTeacher(account, passwd, name, years);
+            //    }
+            //}
+            //return _ht;
+            #endregion
+
+            #region 使用Interlocked类
+            if (_ht != null)
+            {
+                return _ht;
+            }
+            Interlocked.CompareExchange(ref _ht, new HeadTeacher(account, passwd, name, years), null);
+            return _ht;
+
+            #endregion
+        }
+
+        /// <inheritdoc />
         /// <summary>
         /// 学生成绩列表
         /// </summary>
-        /// <param info>所有学生信息</param>
-        /// <param name="IsDisplayRank">是否显示行号</param>
-        /// <param name="IsSort">是否排序</param>
-        public void ViewScoreOfAllStudent(State IsDisplayRank = State.off, State IsSort = State.off)
+        /// <param name="isDisplayRank">是否显示行号</param>
+        /// <param name="isSort">是否排序</param>
+        public void ViewScoreOfAllStudent(State isDisplayRank = State.Off, State isSort = State.Off)
         {
-            if (IsSort == State.on)
+            if (isSort == State.On)
             {
                 InformationLibrary.StudentLibrary.Sort();
             }
             uint row = 1;
             foreach (var index in InformationLibrary.StudentLibrary)
             { 
-                if (IsDisplayRank == State.on)
+                if (isDisplayRank == State.On)
                 {
                     Write($"{row++, -10} ");
                 }
@@ -63,6 +112,8 @@ namespace Sebastien.ClassManager.Core
                 index.ShowMyScore();
             }
         }
+
+        /// <inheritdoc />
         /// <summary>
         /// 显示此分数以上的所有学生
         /// </summary>
@@ -78,15 +129,15 @@ namespace Sebastien.ClassManager.Core
                 IEnumerable<Student> result = from s in InformationLibrary.StudentLibrary
                                               where s.GetTotalScore() >= score
                                               select s;
-                WriteLine($"{"Name",-10}{"TotalScore"}");
-                foreach (Student index in result)
+                WriteLine($"{"Name",-10}TotalScore");
+                foreach (var index in result)
                 {
                     WriteLine($"{index.Name,-10}{index.GetTotalScore(),-10}");
                 }
             }
             catch (ArgumentException)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.ArgumentOutOfRange);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.ArgumentOutOfRange);
             }
         }
         /// <summary>
@@ -98,12 +149,12 @@ namespace Sebastien.ClassManager.Core
             {
                 throw new NullReferenceException();
             }
-            Random rd = new Random();
+            var rd = new Random();
             return NewCurriculum();
 
             Curriculum NewCurriculum()
             {
-                Curriculum temp = new Curriculum();
+                var temp = new Curriculum();
                 for (Int32 line = 0; line < temp.Week; ++line)
                 {
                     for (Int32 row = 0; row < temp.Classes; ++row)
@@ -114,10 +165,10 @@ namespace Sebastien.ClassManager.Core
                 return temp;
             }
         }
+
         /// <summary>
         /// 发布新课表
         /// </summary>
-        /// <param name="cc">新课表</param>
         public async void AddNewCurriculum()
         {
             Curriculum cc = null;
@@ -126,7 +177,7 @@ namespace Sebastien.ClassManager.Core
                 cc = CreateCurriculum();
             }catch(NullReferenceException)
             {
-                UI.DisplayTheInformationOfErrorCode(ErrorCode.CantAdd);
+                Ui.DisplayTheInformationOfErrorCode(ErrorCode.CantAdd);
                 return;
             }
 
@@ -142,9 +193,10 @@ namespace Sebastien.ClassManager.Core
                }
                ReleaseNewMsg(new Message("班主任", "发布了新课表, 快去看看吧~"));
                InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", "发布了新课表"));
-               UI.DisplayTheInformationOfSuccessfully();
+               Ui.DisplayTheInformationOfSuccessfully();
            });
         }
+        /// <inheritdoc />
         /// <summary>
         /// 重写查看班主任信息方法
         /// </summary>

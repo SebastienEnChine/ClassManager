@@ -25,7 +25,7 @@ namespace Sebastien.ClassManager.Core
         /// 成绩索引器
         /// </summary>
         /// <param name="index">科目索引</param>
-        /// <returns>成绩</returns>
+        /// <returns>成绩</returns> 
         public Double? this[Subject index]
         {
             get

@@ -14,17 +14,13 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 学生用户类
     /// </summary>
-    public sealed class Student : User, INotifyPropertyChanged,  IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
+    public sealed class Student 
+        : User, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
     {
         /// <summary>
         /// 成绩
         /// </summary>
         private readonly Double?[] _score = new Double?[Subject.C.GetLengthOfSubject()];
-        /// <summary>
-        /// 属性更改通知
-        /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-
         /// <summary>
         /// 成绩索引器
         /// </summary>
@@ -47,6 +43,7 @@ namespace Sebastien.ClassManager.Core
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
                 _score[(Int32)index] = value;
+
             }
         }
         /// <summary>
@@ -82,7 +79,7 @@ namespace Sebastien.ClassManager.Core
         public Student(Student stu) : base(stu)
         {
             //TODO:
-            for (var index = 0; index < _score.Length; ++index)
+            for (Int32 index = 0; index < _score.Length; ++index)
             {
                 _score[index] = stu[(Subject)index];
             }
@@ -203,9 +200,9 @@ namespace Sebastien.ClassManager.Core
         {
             if (HasNewMsg)
             {
-                for (var index = 0; index < NewMsg.Count; ++index)
+                for (Int32 index = 0; index < NewMsg.Count; ++index)
                 {
-                    var msg = NewMsg.Dequeue();
+                    Message msg = NewMsg.Dequeue();
                     Ui.PrintColorMsg(msg.ToString(), ConsoleColor.Black, ConsoleColor.DarkMagenta);
                     NewMsg.TrimExcess();
                     AllNews.Add(msg);
@@ -222,7 +219,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public void ViewTotalNews()
         {
-            foreach (var index in AllNews)
+            foreach (Message index in AllNews)
             {
                 WriteLine(index);
             }
@@ -235,8 +232,8 @@ namespace Sebastien.ClassManager.Core
         /// <returns></returns>
         public String ToString(String format, IFormatProvider formatProvider)
         {
-            StringBuilder score = new StringBuilder();
-            foreach (var index in _score)
+            var score = new StringBuilder();
+            foreach (Double? index in _score)
             {
                 score.Append($"{index,-10}");
             }
@@ -270,7 +267,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Boolean ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
+        public Boolean ReceiveWeakEvent(Type managerType, Object sender, EventArgs e)
         {
             ReceiveNewCurriculum(sender, e as Message);
             return true;

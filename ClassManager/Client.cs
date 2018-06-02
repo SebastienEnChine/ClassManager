@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading;
 
 #region 其他需求
 //其他: 
@@ -35,13 +36,27 @@ namespace Sebastien.ClassManager.Core
         /// 程序状态
         /// </summary>
         private static State ApplicationState { get; set; } = State.On;
-
+        /// <summary>
+        /// 检查是否已经启动了此程序
+        /// </summary>
+        /// <returns>如果已经启动了此程序则为<see>true</see>, 否则为<see>false</see></returns>
+        private static Boolean IsStarted()
+        {
+            var mutex = new Mutex(false, "ClassManagerLock", out Boolean Started);
+            return Started;
+        }
         /// <summary>
         /// 程序主逻辑
         /// </summary>
         /// <param name="args">命令行参数</param>
         private static void Main(String[] args)
         {
+            if (!IsStarted())
+            {
+                WriteLine("此程序已在运行中, 按任意键关闭此窗口");
+                ReadKey(true);
+                return;
+            }
             Ui.AddStudents();
             Ui.DefaultSetting();
             Ui.AboutThisApplication();
@@ -78,7 +93,7 @@ namespace Sebastien.ClassManager.Core
         /// <returns>选择器对象</returns>
         public static Object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
         {
-            Assembly asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\SelectorLib\bin\Debug\SelectorLib.dll");
+            var asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\SelectorLib\bin\Debug\SelectorLib.dll");
             Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
             Type fullTypeName = coreTypeName.MakeGenericType(typeof(T));
             return asm.CreateInstance(fullTypeName.FullName ?? throw new InvalidOperationException(), true, BindingFlags.Default, null, new Object[] { info, selects }, null, null);
@@ -405,14 +420,14 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 使用传统for循环的旧版本")]
         public static User CheckAccountAvailabilityOldVersionNormal(String account)
         {
-            foreach (var index in InformationLibrary.StudentLibrary)
+            foreach (Student index in InformationLibrary.StudentLibrary)
             {
                 if (account.Equals(index.Account))
                 {
                     return index;
                 }
             }
-            foreach (var index in InformationLibrary.TeacherLibrary)
+            foreach (Instructor index in InformationLibrary.TeacherLibrary)
             {
                 if (account.Equals(index.Account))
                 {
@@ -449,7 +464,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="loginInformation">登录信息</param>
         /// <returns>用户对象</returns>
-        public static User IdentityCheck(Tuple<string, String> loginInformation)
+        public static User IdentityCheck(Tuple<String, String> loginInformation)
         {
             User result = CheckAccountAvailability(loginInformation.Item1);
             if (result == null)

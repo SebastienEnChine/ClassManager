@@ -14,7 +14,7 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 学生用户类
     /// </summary>
-    public sealed class Student 
+    public sealed class Student  
         : User, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
     {
         /// <summary>

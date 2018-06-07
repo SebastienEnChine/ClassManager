@@ -43,7 +43,6 @@ namespace Sebastien.ClassManager.Core
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
                 _score[(Int32)index] = value;
-
             }
         }
         /// <summary>

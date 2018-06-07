@@ -32,10 +32,11 @@ namespace Sebastien.ClassManager.Core
     /// </summary>
     public sealed class Client
     {
+        public static String FileName { get; } = @"D:\Document\TEXT\班级管理系统留言板.txt";
         /// <summary>
         /// 程序状态
         /// </summary>
-        private static State ApplicationState { get; set; } = State.On;
+        private static State _appState = State.On;
         /// <summary>
         /// 检查是否已经启动了此程序
         /// </summary>
@@ -67,7 +68,7 @@ namespace Sebastien.ClassManager.Core
                 currentUser = User.Login();
             } while (currentUser == null);
 
-            while (ApplicationState == State.On)
+            while (_appState == State.On)
              {
                 currentUser.Prompt();
                 switch (currentUser.UserType)
@@ -156,9 +157,15 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewHeadTeacher:
                     currentUser.ViewTheInformationOfTheHeadteacher();
                     break;
+                case Command.LeaveAMessage:
+                    currentUser.LeaveAMessage();
+                    break; //Todo:
+                case Command.ViewLeaveMessages:
+                    currentUser.ViewTheLeaveMessages();
+                    break; //Todo:
                 case Command.Exit:
                     currentUser.LogOut();
-                    ApplicationState = State.Off;
+                    _appState = State.Off;
                     break;
                 default:
                     Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, cmd.ToString());
@@ -200,6 +207,8 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewMyHistory:
                 case Command.ViewCurriculums:
                 case Command.ViewHeadTeacher:
+                case Command.LeaveAMessage:
+                case Command.ViewLeaveMessages:
                     result = RunForUser(stu, cmd);
                     break;
                 case Command.ViewNews:
@@ -262,6 +271,8 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewMyHistory:
                 case Command.ViewCurriculums:
                 case Command.ViewHeadTeacher:
+                case Command.LeaveAMessage:
+                case Command.ViewLeaveMessages:
                     result = RunForUser(teacher, cmd);
                     break;
                 case Command.StudentsPreview:
@@ -291,7 +302,6 @@ namespace Sebastien.ClassManager.Core
             }
             return result;
         }
-
         /// <summary>
         /// 交互(班主任用户)
         /// </summary>
@@ -324,7 +334,9 @@ namespace Sebastien.ClassManager.Core
                 case Command.ChangeSex:
                 case Command.ViewMyHistory:
                 case Command.ViewCurriculums:
-                    //case Command.ViewHeadTeacher:
+                case Command.LeaveAMessage:
+                case Command.ViewLeaveMessages:
+                //case Command.ViewHeadTeacher:
                     result = RunForUser(headTeacher, cmd);
                     break;
                 case Command.ChangeName:

@@ -124,6 +124,14 @@
         /// <summary>
         /// 查看高于指定分数的所有学生
         /// </summary>
-        HighThan
+        HighThan,
+        /// <summary>
+        /// 留言墙
+        /// </summary>
+        LeaveAMessage,
+        /// <summary>
+        /// 查看留言墙
+        /// </summary>
+        ViewLeaveMessages
     }
 }

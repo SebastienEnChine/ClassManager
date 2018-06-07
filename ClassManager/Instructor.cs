@@ -77,8 +77,8 @@ namespace Sebastien.ClassManager.Core
                 //InformationLibrary.StudentLibrary.Sort(new Student.StudentCompare(TeachingRange));
                 InformationLibrary.StudentLibrary.Sort((x, y) => x[TeachingRange] < y[TeachingRange] ? 1 : -1);
             }
-            uint row = 1;
-            foreach (var index in InformationLibrary.StudentLibrary)
+            UInt32 row = 1;
+            foreach (Student index in InformationLibrary.StudentLibrary)
             {
                 if (row % 2 == 1)
                 {
@@ -114,13 +114,13 @@ namespace Sebastien.ClassManager.Core
                 }
 
                 WriteLine($"{"Name",-10}Score");
-                IEnumerable<Student> result = from stu in InformationLibrary.StudentLibrary
-                                              where stu[TeachingRange] >= score
-                                              select stu;
-                Parallel.ForEach(result, student =>
+                Parallel.ForEach(InformationLibrary.StudentLibrary.Where(stu => stu[TeachingRange] >= score), student =>
                 {
                     WriteLine($"{student.Name,-10}{student[TeachingRange],-10}");
                 });
+                //IEnumerable<Student> result = from stu in InformationLibrary.StudentLibrary
+                //                              where stu[TeachingRange] >= score
+                //                              select stu;
             }
             catch(ArgumentOutOfRangeException)
             {

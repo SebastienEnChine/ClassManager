@@ -1,11 +1,14 @@
 ﻿using System;
-using static System.Console;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Sebastien.ClassManager.Enums;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Linq;
+using static System.Console;
+using System.IO;
+using System.Text;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -84,6 +87,8 @@ namespace Sebastien.ClassManager.Core
             WriteLine("TeachersPreview: 教师列表预览");
             WriteLine("ViewCurriculums: 查看课表");
             WriteLine("ViewMyHistory: 查看我的操作记录");
+            WriteLine("LeaveAMessage: 在公共留言墙上写一条公共留言");
+            WriteLine("ViewLeaveMessages: 浏览公共留言墙");
             WriteLine("Exit: 退出程序");
         }
         /// <summary>
@@ -233,7 +238,7 @@ namespace Sebastien.ClassManager.Core
                 return;
             }
 
-            WriteLine($"{"Name",-10}{"Account", -10}{"UserType", -10}{"Sex",-7}{"Age",-5}{"CreatedTime", -20}");
+            WriteLine($"{"Name",-10}{"Account",-10}{"UserType",-10}{"Sex",-7}{"Age",-5}{"CreatedTime",-20}");
             Boolean isWhite = true;
             Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
             {
@@ -283,14 +288,14 @@ namespace Sebastien.ClassManager.Core
                         {
                             ConsoleColor bg = isWhite ? ConsoleColor.White : ConsoleColor.Black;
                             ConsoleColor fg = isWhite ? ConsoleColor.Black : ConsoleColor.White;
-                            PrintColorMsg($"{InformationLibrary.TeacherLibrary[index].Name,-10}", 
+                            PrintColorMsg($"{InformationLibrary.TeacherLibrary[index].Name,-10}",
                                                     bg, ConsoleColor.DarkYellow);
                             PrintColorMsg($"{InformationLibrary.TeacherLibrary[index].Account,-10}" +
                                                     $"{InformationLibrary.TeacherLibrary[index].UserType,-10}" +
                                                     $"{InformationLibrary.TeacherLibrary[index].Sex,-7}" +
                                                     $"{InformationLibrary.TeacherLibrary[index].Age,-5}" +
                                                     $"{InformationLibrary.TeacherLibrary[index].CreatedTime,-20}" +
-                                                    $"{InformationLibrary.TeacherLibrary[index].YearsOfProfessional, -7}", 
+                                                    $"{InformationLibrary.TeacherLibrary[index].YearsOfProfessional,-7}",
                                                     bg, fg);
                             WriteLine();
                             isWhite = !isWhite;
@@ -417,10 +422,12 @@ namespace Sebastien.ClassManager.Core
         /// <param name="me">当前用户</param>
         public static void ViewMyHistory(this User me)
         {
-            for (Int32 historyIndex = me.GetHistory().Count - 1; historyIndex >= 0; --historyIndex)
-            {
-                WriteLine(me.GetHistory()[historyIndex]);
-            }
+            me.GetHistory().OrderByDescending(msg => msg.Time).ToList().ForEach(WriteLine);
+
+            //var messages = (from msg in me.GetHistory()
+            //                          orderby msg.Time descending
+            //                          select msg).ToList();
+            //messages.ForEach(WriteLine);
         }
         /// <summary>
         /// 查看课表
@@ -441,7 +448,51 @@ namespace Sebastien.ClassManager.Core
                 InformationLibrary._curriculums[1].Draw();
             }
         }
+        /// <summary>
+        /// 在公共留言墙上写一条公共留言
+        /// </summary>
+        /// <param name="me"></param>
+        public static void LeaveAMessage(this User me)
+        {
+            Write("请输入你想说的话: > ");
+            String msg = $"[{DateTime.Now}] {me.Name, -15} : {ReadLine()}\r\n";
+            me.AddHistory(new Message("你", msg));
+            using (FileStream inputStream = File.OpenWrite(Client.FileName))
+            {
+                inputStream.Seek(0, SeekOrigin.End);
 
+                Byte[] buffer = Encoding.Default.GetBytes($"{me.Name,-15} : {msg}\r\n");
+                inputStream.Write(buffer, 0, buffer.Length);
+            }
+            DisplayTheInformationOfSuccessfully("留言成功~");
+        }
+        /// <summary>
+        /// 浏览公共留言墙
+        /// </summary>
+        /// <param name="me"></param>
+        public static void ViewTheLeaveMessages(this User me)
+        {
+            //using (FileStream outputStream = File.OpenRead(Client.FileName))
+            //{
+            //    Boolean isCompleted = false;
+            //    Byte[] buffer = new Byte[256];
+            //    do
+            //    {
+            //        Int32 readCount = outputStream.Read(buffer, 0, buffer.Length);
+            //        if (readCount == 0)
+            //        {
+            //            isCompleted = true;
+            //        }
+            //        else if (readCount < buffer.Length)
+            //        {
+            //            Array.Clear(buffer, readCount, buffer.Length - readCount);
+            //        }
+            //        String msg = Encoding.Default.GetString(buffer, 0, buffer.Length);
+            //        WriteLine(msg);
+            //    } while (!isCompleted);
+            //}
+            File.ReadLines(Client.FileName, Encoding.Default).ToList().ForEach(WriteLine);
+        }
         /// <summary>
         /// 新消息提示
         /// </summary>
@@ -472,11 +523,6 @@ namespace Sebastien.ClassManager.Core
             //用于显示成绩的列的标题
             void DisplayAllScoreTitle(State isSortAndRank)
             {
-                if (!Enum.IsDefined(typeof(State), isSortAndRank))
-                {
-                    throw new InvalidEnumArgumentException(nameof(isSortAndRank), (Int32)isSortAndRank, typeof(State));
-                }
-
                 if (isSortAndRank == State.On)
                 {
                     Write($"{"No.",-10}");
@@ -859,7 +905,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public static void DefaultTitle()
         {
-            Title = "StudentManagerStudio";
+            Title = "ClassManager";
         }
 
         /// <summary>
@@ -887,7 +933,7 @@ namespace Sebastien.ClassManager.Core
                 }
                 else  //过滤掉功能按键等
                 {
-                    if (char.IsControl(keyInfo.KeyChar))
+                    if (Char.IsControl(keyInfo.KeyChar))
                     {
                         continue;
                     }

@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using Sebastien.ClassManager.Enums;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Linq;
-using static System.Console;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Diagnostics;
+using static System.Console;
+using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Collections.Generic;
+using Sebastien.ClassManager.Enums;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -89,6 +89,7 @@ namespace Sebastien.ClassManager.Core
             WriteLine("ViewMyHistory: 查看我的操作记录");
             WriteLine("LeaveAMessage: 在公共留言墙上写一条公共留言");
             WriteLine("ViewLeaveMessages: 浏览公共留言墙");
+            WriteLine("UrlTest: 测试此计算机能否被指定Web地址响应");
             WriteLine("Exit: 退出程序");
         }
         /// <summary>
@@ -448,51 +449,7 @@ namespace Sebastien.ClassManager.Core
                 InformationLibrary._curriculums[1].Draw();
             }
         }
-        /// <summary>
-        /// 在公共留言墙上写一条公共留言
-        /// </summary>
-        /// <param name="me"></param>
-        public static void LeaveAMessage(this User me)
-        {
-            Write("请输入你想说的话: > ");
-            String msg = $"[{DateTime.Now}] {me.Name, -15} : {ReadLine()}\r\n";
-            me.AddHistory(new Message("你", msg));
-            using (FileStream inputStream = File.OpenWrite(Client.FileName))
-            {
-                inputStream.Seek(0, SeekOrigin.End);
 
-                Byte[] buffer = Encoding.Default.GetBytes($"{me.Name,-15} : {msg}\r\n");
-                inputStream.Write(buffer, 0, buffer.Length);
-            }
-            DisplayTheInformationOfSuccessfully("留言成功~");
-        }
-        /// <summary>
-        /// 浏览公共留言墙
-        /// </summary>
-        /// <param name="me"></param>
-        public static void ViewTheLeaveMessages(this User me)
-        {
-            //using (FileStream outputStream = File.OpenRead(Client.FileName))
-            //{
-            //    Boolean isCompleted = false;
-            //    Byte[] buffer = new Byte[256];
-            //    do
-            //    {
-            //        Int32 readCount = outputStream.Read(buffer, 0, buffer.Length);
-            //        if (readCount == 0)
-            //        {
-            //            isCompleted = true;
-            //        }
-            //        else if (readCount < buffer.Length)
-            //        {
-            //            Array.Clear(buffer, readCount, buffer.Length - readCount);
-            //        }
-            //        String msg = Encoding.Default.GetString(buffer, 0, buffer.Length);
-            //        WriteLine(msg);
-            //    } while (!isCompleted);
-            //}
-            File.ReadLines(Client.FileName, Encoding.Default).ToList().ForEach(WriteLine);
-        }
         /// <summary>
         /// 新消息提示
         /// </summary>
@@ -731,7 +688,7 @@ namespace Sebastien.ClassManager.Core
                                                 "Java任课老师",
                                                 "SQL数据库任课老师"
                                             },
-                                          new Subject[]
+                                          new[]
                                           {
                                                  Subject.C,
                                                  Subject.CPlusPlus,
@@ -866,6 +823,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public static void AboutThisApplication()
         {
+            Clear();
             ForegroundColor = ConsoleColor.White;
             WriteLine("-------------------------------------------------------------------------");
             WriteLine("  [ Student Manager Studio <SMS> ]");
@@ -1040,6 +998,31 @@ namespace Sebastien.ClassManager.Core
             ForegroundColor = fg;
             Write(msg);
             DefaultColor();
+        }
+        /// <summary>
+        /// 将班主任信息保存到文件
+        /// </summary>
+        public static void SaveHeadTeacher()
+        {
+            FileStream output = File.OpenWrite(Client.FileName);
+            using (var writer = new BinaryWriter(output))
+            {
+                writer.Write(InformationLibrary.HeadTeacherUser.Account);
+                writer.Write(InformationLibrary.HeadTeacherUser.Passwd);
+                writer.Write(InformationLibrary.HeadTeacherUser.Name);
+                writer.Write(InformationLibrary.HeadTeacherUser.Age);
+            }
+        }
+        /// <summary>
+        /// 从文件读取班主任信息
+        /// </summary>
+        public static void ReadHeadTeacher()
+        {
+            FileStream input = File.OpenRead(Client.FileName);
+            using (var reader = new BinaryReader(input))
+            {
+                WriteLine($"Account: {reader.ReadString()}, Passwd: {reader.ReadString()}, Name: {reader.ReadString()}, Age: {reader.ReadInt32()}");
+            }
         }
     }
 }

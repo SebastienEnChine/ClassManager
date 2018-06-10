@@ -32,7 +32,7 @@ namespace Sebastien.ClassManager.Core
     /// </summary>
     public sealed class Client
     {
-        public static String FileName { get; } = @"D:\Document\TEXT\班级管理系统留言板.txt";
+        public static String FileName { get; } = @"D:\Document\TEXT\班级管理系统留言板";
         /// <summary>
         /// 程序状态
         /// </summary>
@@ -58,6 +58,7 @@ namespace Sebastien.ClassManager.Core
                 ReadKey(true);
                 return;
             }
+            Clear();
             Ui.AddStudents();
             Ui.DefaultSetting();
             Ui.AboutThisApplication();
@@ -86,6 +87,7 @@ namespace Sebastien.ClassManager.Core
                         throw new ArgumentException();
                 }
              }
+            Ui.ReadHeadTeacher();
         }
 
         /// <summary>
@@ -167,6 +169,9 @@ namespace Sebastien.ClassManager.Core
                     currentUser.LogOut();
                     _appState = State.Off;
                     break;
+                case Command.UrlTest:
+                    currentUser.UrlTest();
+                    break;
                 default:
                     Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, cmd.ToString());
                     break;
@@ -209,6 +214,7 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewHeadTeacher:
                 case Command.LeaveAMessage:
                 case Command.ViewLeaveMessages:
+                case Command.UrlTest:
                     result = RunForUser(stu, cmd);
                     break;
                 case Command.ViewNews:
@@ -273,6 +279,7 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewHeadTeacher:
                 case Command.LeaveAMessage:
                 case Command.ViewLeaveMessages:
+                case Command.UrlTest:
                     result = RunForUser(teacher, cmd);
                     break;
                 case Command.StudentsPreview:
@@ -336,7 +343,8 @@ namespace Sebastien.ClassManager.Core
                 case Command.ViewCurriculums:
                 case Command.LeaveAMessage:
                 case Command.ViewLeaveMessages:
-                //case Command.ViewHeadTeacher:
+                case Command.UrlTest:
+                    //case Command.ViewHeadTeacher:
                     result = RunForUser(headTeacher, cmd);
                     break;
                 case Command.ChangeName:

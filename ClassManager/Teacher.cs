@@ -13,6 +13,9 @@ namespace Sebastien.ClassManager.Core
         /// 从业年份
         /// </summary>
         public Int32 YearsOfProfessional { get; }
+        /// <summary>
+        /// 事件: 发布通知
+        /// </summary>
         public event EventHandler<Message> NewMsg;
         /// <summary>
         /// 默认构造函数

@@ -132,6 +132,10 @@
         /// <summary>
         /// 查看留言墙
         /// </summary>
-        ViewLeaveMessages
+        ViewLeaveMessages,
+        /// <summary>
+        /// 测试计算机能否被指定Web地址响应
+        /// </summary>
+        UrlTest
     }
 }

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 
 namespace Sebastien.ClassManager.Core
 {
@@ -17,7 +20,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 账号
         /// </summary>
-        private readonly String _account;
+        private readonly String _account; 
         /// <summary>
         /// 查找方式
         /// </summary>
@@ -88,7 +91,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 登录计时任务取消令牌
         /// </summary>
-        private CancellationTokenSource _cts = default(CancellationTokenSource);
+        protected CancellationTokenSource _cts = default(CancellationTokenSource);
         /// <summary>
         /// 登录管道输出
         /// </summary>
@@ -96,7 +99,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 计时器
         /// </summary>
-        private Stopwatch _sw = default(Stopwatch);
+        protected Stopwatch _sw = default;
 
         /// <summary>
         /// 账号
@@ -125,7 +128,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 年龄
         /// </summary>
-        private Int32 _age;
+        protected Int32 _age;
         public Int32 Age
         {
             get => _age;
@@ -136,6 +139,7 @@ namespace Sebastien.ClassManager.Core
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
                 _age = value;
+                Ui.SaveHeadTeacher();
             }
         }
         /// <summary>
@@ -145,7 +149,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 操作记录
         /// </summary>
-        private List<Message> History { get; } = new List<Message>();
+        protected List<Message> History { get; } = new List<Message>();
 
         /// <summary>
         /// 注销登录
@@ -154,7 +158,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 登录计时(异常处理)
         /// </summary>
-        private async void CallTimingAndException()
+        protected async void CallTimingAndException()
         {
             try
             {
@@ -169,7 +173,7 @@ namespace Sebastien.ClassManager.Core
         /// 计时
         /// </summary>
         /// <returns></returns>
-        private Task Timing()
+        protected Task Timing()
         {
             _cts = new CancellationTokenSource();
             _sw = new Stopwatch();
@@ -268,5 +272,124 @@ namespace Sebastien.ClassManager.Core
         /// 个人信息概览
         /// </summary>
         public void ViewPersonalInformation() => WriteLine(this);
+        /// <summary>
+        /// 在公共留言墙上写一条公共留言
+        /// </summary>
+        /// <param name="me"></param>
+        public  void LeaveAMessage()
+        {
+            Write("请输入你想说的话: > ");
+            String msg = $"[{DateTime.Now.ToLocalTime()}] {Name,-15} : {ReadLine()}{Environment.NewLine}";
+
+            AddHistory(new Message("你", $"[公共留言墙留言]: {msg}"));
+            //using (FileStream inputStream = File.OpenWrite(Client.FileName))
+            //{
+            //    inputStream.Seek(0, SeekOrigin.End);
+
+            //    Byte[] buffer = Encoding.Default.GetBytes(msg);
+            //    inputStream.Write(buffer, 0, buffer.Length);
+            //}
+            FileStream inputStream = File.OpenWrite(Client.FileName);
+            using (var writer = new BinaryWriter(inputStream))
+            {
+                writer.Seek(0, SeekOrigin.End);
+                writer.Write(msg);
+            }
+            Ui.DisplayTheInformationOfSuccessfully("留言成功~");
+        }
+        /// <summary>
+        /// 浏览公共留言墙
+        /// </summary>
+        /// <param name="me"></param>
+        public  void ViewTheLeaveMessages()
+        {
+            //using (FileStream outputStream = File.OpenRead(Client.FileName))
+            //{
+            //    Boolean isCompleted = false;
+            //    Byte[] buffer = new Byte[256];
+            //    do
+            //    {
+            //        Int32 readCount = outputStream.Read(buffer, 0, buffer.Length);
+            //        if (readCount == 0)
+            //        {
+            //            isCompleted = true;
+            //        }
+            //        else if (readCount < buffer.Length)
+            //        {
+            //            Array.Clear(buffer, readCount, buffer.Length - readCount);
+            //        }
+            //        String msg = Encoding.Default.GetString(buffer, 0, buffer.Length);
+            //        WriteLine(msg);
+            //    } while (!isCompleted);
+            //}
+            BinaryReader reader = null;
+            try
+            {
+                FileStream input = File.OpenRead(Client.FileName);
+                reader = new BinaryReader(input);
+                while (true)
+                {
+                    Write(reader.ReadString());
+                }
+            }
+            catch (EndOfStreamException)
+            {
+                WriteLine("--------------END-------------");
+            }
+            finally
+            {
+                reader.Dispose();
+            }
+            //File.ReadLines(Client.FileName, Encoding.Default).ToList().ForEach(WriteLine);
+        }
+
+        /// <summary>
+        /// 测试此计算机是否能被指定的Web地址响应
+        /// </summary>
+        public void UrlTest()
+        {
+            Write("在测试之前, 请提供Web地址(如: http://www.baidu.com):  ");
+            CallGetInfoOfUrl(ReadLine());
+            Ui.PrintColorMsg($"已将此任务放入后台, 任务完成之后会以窗口的形式报告结果, 在此期间你可以进行其他操作.{Environment.NewLine}", ConsoleColor.Black, ConsoleColor.DarkMagenta);
+        }
+        /// <summary>
+        /// 发送Http请求(调用和异常处理)
+        /// </summary>
+        /// <param name="url"></param>
+        public async void CallGetInfoOfUrl(String url)
+        {
+            try
+            {
+                await GetInfoOfUrl(url);
+            }
+            catch(InvalidOperationException ex)
+            {
+                Ui.DisplayTheInformationOfSuccessfully(ex.Message);
+            }
+            catch(HttpRequestException ex)
+            {
+                Ui.DisplayTheInformationOfSuccessfully(ex.Message);
+            }
+        }
+        /// <summary>
+        /// 发送Http请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public async Task GetInfoOfUrl(String url)
+        {
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+                if (response.IsSuccessStatusCode)
+                {
+                    String httpText = await response.Content.ReadAsStringAsync();
+                    String savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{url.Split('.')[1]}.html");
+                    File.WriteAllText(savePath, httpText);
+                    await Task.Delay(5000); //模拟耗时请求
+                    Ui.DisplayTheInformationOfSuccessfully($"请求已被响应! 网页已被保存到: 我的文档\\{url.Split('.')[1]}.html");
+                }
+            }
+        }
     }
 }

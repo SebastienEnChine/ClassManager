@@ -36,7 +36,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <param name="userType">用户类型</param>
-        public Instructor(String account, String passwd, String name, Int32 years, Subject range, Identity userType = Identity.Instructor)
+        public Instructor(string account, string passwd, string name, int years, Subject range, Identity userType = Identity.Instructor)
             : base(account, passwd, name, years, userType) => TeachingRange = range;
         /// <summary>
         /// 构造函数
@@ -48,20 +48,20 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Instructor(String account, String passwd, String name, Subject range, TheSex sex, Int32 age, String address, Int32 years, Identity userType = Identity.Instructor)
+        public Instructor(string account, string passwd, string name, Subject range, TheSex sex, int age, string address, int years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, sex, age, address, years, userType) => TeachingRange = range;
 
         /// <summary>
         /// 重写基类的ToString()方法
         /// </summary>
         /// <returns></returns>
-        public override String ToString() => $"{base.ToString()}\n所教科目: {TeachingRange}\n";
+        public override string ToString() => $"{base.ToString()}\n所教科目: {this.TeachingRange}\n";
         /// <summary>
         /// 获取此学生某单科目的成绩
         /// </summary>
         /// <param name="stu">学生</param>
         /// <returns>成绩</returns>
-        public Double? GetScoreOfThisStudent(Student stu) => stu[TeachingRange];
+        public Double? GetScoreOfThisStudent(Student stu) => stu[this.TeachingRange];
         /// <summary>
         /// 显示学生成绩列表
         /// </summary>
@@ -75,7 +75,7 @@ namespace Sebastien.ClassManager.Core
             {
                 //(依赖于Student.cs文件中的StudentCompare类)
                 //InformationLibrary.StudentLibrary.Sort(new Student.StudentCompare(TeachingRange));
-                InformationLibrary.StudentLibrary.Sort((x, y) => x[TeachingRange] < y[TeachingRange] ? 1 : -1);
+                InformationLibrary.StudentLibrary.Sort((x, y) => x[this.TeachingRange] < y[this.TeachingRange] ? 1 : -1);
             }
             UInt32 row = 1;
             foreach (Student index in InformationLibrary.StudentLibrary)
@@ -94,7 +94,7 @@ namespace Sebastien.ClassManager.Core
                 {
                     Write($"{row++} ");
                 }
-                WriteLine($"{index.Name, -10} {index[TeachingRange]}");
+                WriteLine($"{index.Name, -10} {index[this.TeachingRange]}");
             }
             Ui.DefaultColor();
         }
@@ -104,7 +104,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="score">指定分数</param>
         /// <exception cref="ArgumentOutOfRangeException">score大于100或者小于0时引发此异常</exception>
-        public void GetStuHighThan(Int32 score)
+        public void GetStuHighThan(int score)
         {
             try
             {
@@ -114,9 +114,9 @@ namespace Sebastien.ClassManager.Core
                 }
 
                 WriteLine($"{"Name",-10}Score");
-                Parallel.ForEach(InformationLibrary.StudentLibrary.Where(stu => stu[TeachingRange] >= score), student =>
+                Parallel.ForEach(InformationLibrary.StudentLibrary.Where(stu => stu[this.TeachingRange] >= score), student =>
                 {
-                    WriteLine($"{student.Name,-10}{student[TeachingRange],-10}");
+                    WriteLine($"{student.Name,-10}{student[this.TeachingRange],-10}");
                 });
                 //IEnumerable<Student> result = from stu in InformationLibrary.StudentLibrary
                 //                              where stu[TeachingRange] >= score

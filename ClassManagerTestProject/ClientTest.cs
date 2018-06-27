@@ -12,7 +12,7 @@ namespace Sebastien.ClassManager.TestProject
         public void GetCmdTest1()
         {
             //arrange
-            String input = "MyScore";
+            var input = "MyScore";
             //act
             Command expected = Command.MyScore;
             Client.GetCmd(input, out Command cmd);
@@ -28,10 +28,10 @@ namespace Sebastien.ClassManager.TestProject
         public void GetCmdTest2()
         {
             //arrange
-            String input = "random";
+            var input = "random";
             //act
-            String expected = null;
-            String actual = Client.GetCmd(input, out Command cmd);
+            string expected = null;
+            var actual = Client.GetCmd(input, out Command cmd);
             //assert
             Assert.AreEqual(expected, actual);
         }
@@ -39,10 +39,10 @@ namespace Sebastien.ClassManager.TestProject
         public void IdentityCheckTest()
         {
             //arrange
-            Tuple<String, String> info = Tuple.Create("headteacher", "1234");
+            var info = Tuple.Create("headteacher", "1234");
             //act
-            User expected = null;
-            User result = Client.IdentityCheck(info);
+            UserCore expected = null;
+            UserCore result = Client.IdentityCheck(info);
             //assert
             Assert.AreNotEqual(expected, result);
         }
@@ -50,9 +50,9 @@ namespace Sebastien.ClassManager.TestProject
         public void CheckAccountAvailabilityTest()
         {
             //arrange
-            String account = "headteacher";
+            var account = "headteacher";
             //act
-            User result = Client.CheckAccountAvailability(account);
+            UserCore result = Client.CheckAccountAvailability(account);
             //assert
             Assert.AreNotEqual(result, null);
         }

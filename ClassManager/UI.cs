@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using static System.Console;
 using System.Threading.Tasks;
-using System.ComponentModel;
 using System.Collections.Generic;
 using Sebastien.ClassManager.Enums;
 
@@ -20,10 +17,10 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 同步锁
         /// </summary>
-        private static readonly Object LocalLock = new Object();
-        ///// <summary>
-        ///// 任务取消令牌
-        ///// </summary>
+        private static readonly object LocalLock = new object();
+        /// <summary>
+        /// 任务取消令牌
+        /// </summary>
         //public static CancellationTokenSource _cts = new CancellationTokenSource();
 
         /// <summary>
@@ -31,21 +28,21 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="subject"></param>
         /// <returns></returns>
-        public static Int32 GetLengthOfSubject(this Subject subject)
+        public static int GetLengthOfSubject(this Subject subject)
         {
             return Enum.GetNames(subject.GetType()).Length;
         }
 
         #region 用户，学生，教师， 班主任类的扩展方法
         /// <summary>
-        /// 随机向Information.StudentLibrary几何中添加500个Student对象
+        /// 随机向Information.StudentLibrary几何中添加100个Student对象
         /// Todo: 可修改为使用多线程操作, 并使用并发集合或线程同步
         /// </summary>
         public static async void AddStudents()
         {
             await Task.Run(() =>
             {
-                for (Int32 index = 0; index < 500; ++index)
+                for (var index = 0; index < 100; ++index)
                 {
                     InformationLibrary.StudentLibrary.Add(new Student($"index{index}", "1234", $"index{index}"));
                 }
@@ -55,7 +52,7 @@ namespace Sebastien.ClassManager.Core
         /// 获取帮助(指定用户)
         /// </summary>
         /// <exception cref="ArgumentException"></exception>
-        public static void GetHelp(this User me)
+        public static void GetHelp(this UserCore me)
         {
             switch (me.UserType)
             {
@@ -145,7 +142,7 @@ namespace Sebastien.ClassManager.Core
             SetCursorPosition(50, 10);
             WriteLine("Who are you?");
             dynamic dm = Client.GetSelectorObject<Identity>(
-                info: new List<String>
+                info: new List<string>
                 {
                     "Student",
                     "Teacher",
@@ -170,7 +167,7 @@ namespace Sebastien.ClassManager.Core
         /// 显示命令提示符
         /// </summary>
         /// <param name="me"></param>
-        public static void Prompt(this User me)
+        public static void Prompt(this UserCore me)
         {
             switch (me.UserType)
             {
@@ -192,7 +189,7 @@ namespace Sebastien.ClassManager.Core
         /// 显示登录成功问候语
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void SayHello(this User me)
+        public static void SayHello(this UserCore me)
         {
             switch (DateTime.Now.Hour)
             {
@@ -240,10 +237,10 @@ namespace Sebastien.ClassManager.Core
             }
 
             WriteLine($"{"Name",-10}{"Account",-10}{"UserType",-10}{"Sex",-7}{"Age",-5}{"CreatedTime",-20}");
-            Boolean isWhite = true;
+            var isWhite = true;
             Parallel.ForEach(InformationLibrary.StudentLibrary, stu =>
             {
-                Boolean lockTaken = false;                //必须为false
+                var lockTaken = false;                //必须为false
                 Monitor.TryEnter(LocalLock, 100, ref lockTaken);
                 if (lockTaken)
                 {
@@ -272,16 +269,16 @@ namespace Sebastien.ClassManager.Core
         /// 显示教师列表
         /// </summary>
         /// <param name="me"></param>
-        public static void DisplayTeacherList(this User me)
+        public static void DisplayTeacherList(this UserCore me)
         {
             if (InformationLibrary.TeacherLibrary.Count > 0)
             {
                 var sLock = new SpinLock();
-                Boolean isWhite = true;
+                var isWhite = true;
                 WriteLine($"{"Name",-10}{"Account",-10}{"UserType",-10}{"Sex",-7}{"Age",-5}{"CreatedTime",-20}{"Since",-7}");
                 Parallel.For(0, InformationLibrary.TeacherLibrary.Count, index =>
                 {
-                    Boolean hasLock = false;
+                    var hasLock = false;
                     sLock.Enter(ref hasLock);
                     if (hasLock)
                     {
@@ -321,7 +318,7 @@ namespace Sebastien.ClassManager.Core
         /// 修改密码(调用和异常处理)
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void CallChangeMyPasswd(this User me)
+        public static void CallChangeMyPasswd(this UserCore me)
         {
             try
             {
@@ -336,14 +333,14 @@ namespace Sebastien.ClassManager.Core
         /// 修改密码
         /// </summary>
         /// <param name="me">当前用户</param>
-        private static void ChangeMyPasswd(this User me)
+        private static void ChangeMyPasswd(this UserCore me)
         {
             Write("请输入当前密码: ");
-            String currentPasswd = ReadLine();
+            var currentPasswd = ReadLine();
             Write("请输入新密码: ");
-            String firstPasswd = ReadLine();
+            var firstPasswd = ReadLine();
             Write("请再次输入新密码: ");
-            String secondPasswd = ReadLine();
+            var secondPasswd = ReadLine();
             if (firstPasswd != null && !firstPasswd.Equals(secondPasswd))
             {
                 DisplayTheInformationOfErrorCode(ErrorCode.InconsistentPassword);
@@ -359,7 +356,7 @@ namespace Sebastien.ClassManager.Core
         /// 修改年龄(调用和异常处理)
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void CallChangeMyAge(this User me)
+        public static void CallChangeMyAge(this UserCore me)
         {
             try
             {
@@ -378,10 +375,10 @@ namespace Sebastien.ClassManager.Core
         /// 修改年龄
         /// </summary>
         /// <param name="me">当前用户</param>
-        private static void ChangeMyAge(this User me)
+        private static void ChangeMyAge(this UserCore me)
         {
             Write("请输入你当前的年龄: ");
-            if (Int32.TryParse(ReadLine(), out Int32 age))
+            if (int.TryParse(ReadLine(), out var age))
             {
                 me.Age = age;
                 me.AddHistory(new Message("你", $"重新设置了年龄({me.Age})"));
@@ -396,10 +393,10 @@ namespace Sebastien.ClassManager.Core
         /// 修改地址
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void ChangeMyAddress(this User me)
+        public static void ChangeMyAddress(this UserCore me)
         {
             Write("地址: ");
-            String address = ReadLine();
+            var address = ReadLine();
             me.AddHistory(new Message("你", $"重新设置了地址({me.Address = address})"));
             DisplayTheInformationOfSuccessfully();
         }
@@ -407,10 +404,10 @@ namespace Sebastien.ClassManager.Core
         /// 修改性别
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void ChangeMySex(this User me)
+        public static void ChangeMySex(this UserCore me)
         {
             WriteLine("设置新性别: (选择: 上/下方向键   确定: 回车键) ");
-            dynamic dm = Client.GetSelectorObject(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame);
+            dynamic dm = Client.GetSelectorObject(new List<string> { "男", "女" }, TheSex.Male, TheSex.Frame);
             TheSex result = dm.GetSelect();
             //不使用动态加载
             //TheSex result = new Selector<TheSex>(new List<String> { "男", "女" }, TheSex.Male, TheSex.Frame).GetSubject();
@@ -421,7 +418,7 @@ namespace Sebastien.ClassManager.Core
         /// 查看我的操作记录
         /// </summary>
         /// <param name="me">当前用户</param>
-        public static void ViewMyHistory(this User me)
+        public static void ViewMyHistory(this UserCore me)
         {
             me.GetHistory().OrderByDescending(msg => msg.Time).ToList().ForEach(WriteLine);
 
@@ -433,7 +430,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 查看课表
         /// </summary>
-        public static void ViewCurriculum(this User me)
+        public static void ViewCurriculum(this UserCore me)
         {
             Client.UpdateCurriculum();
             if (InformationLibrary._curriculums[0] == null)
@@ -496,7 +493,7 @@ namespace Sebastien.ClassManager.Core
             try
             {
                 Write("你想将分数指定为: ");
-                teacher.GetStuHighThan(Int32.Parse(ReadLine()));
+                teacher.GetStuHighThan(int.Parse(ReadLine()));
             }
             catch (FormatException)
             {
@@ -526,7 +523,7 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeMyName(this HeadTeacher ht)
         {
             Write("新姓名: ");
-            String name = ReadLine();
+            var name = ReadLine();
 
             Debug.Assert(InformationLibrary.HeadTeacherUser != null, "InformationLibrary.HeadTeacherUser != null");
             InformationLibrary.HeadTeacherUser.Name = name;
@@ -541,35 +538,31 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeNameOfOtherUser(this HeadTeacher ht)
         {
             Write("请输入将要更改姓名的账户：");
-            String account = ReadLine();
-            for (Int32 index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
+            var account = ReadLine();
+            foreach (Student student in InformationLibrary.StudentLibrary)
             {
-                if (account == InformationLibrary.StudentLibrary[index].Account)
-                {
-                    Write("新姓名: ");
-                    String name = ReadLine();
-                    InformationLibrary.StudentLibrary[index].Name = name;
-                    InformationLibrary.HeadTeacherUser.AddHistory(
-                        new Message("你", $"将{InformationLibrary.StudentLibrary[index].Account}的姓名重新设置为({name})")
-                        );
-                    DisplayTheInformationOfSuccessfully();
-                    return;
-                }
+                if (account != student.Account) continue;
+                Write("新姓名: ");
+                var name = ReadLine();
+                student.Name = name;
+                InformationLibrary.HeadTeacherUser.AddHistory(
+                    new Message("你", $"将{student.Account}的姓名重新设置为({name})")
+                );
+                DisplayTheInformationOfSuccessfully();
+                return;
             }
-            for (Int32 index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
+            foreach (Instructor teacher in InformationLibrary.TeacherLibrary)
             {
-                if (account == InformationLibrary.TeacherLibrary[index].Account)
-                {
-                    Write("新姓名: ");
-                    String name = ReadLine();
+                if (account != teacher.Account) continue;
+                Write("新姓名: ");
+                var name = ReadLine();
 
-                    InformationLibrary.TeacherLibrary[index].Name = name;
-                    InformationLibrary.HeadTeacherUser.AddHistory(
-                        new Message("你", $"将{InformationLibrary.TeacherLibrary[index].Account}的姓名重新设置为({name})")
-                        );
-                    DisplayTheInformationOfSuccessfully();
-                    return;
-                }
+                teacher.Name = name;
+                InformationLibrary.HeadTeacherUser.AddHistory(
+                    new Message("你", $"将{teacher.Account}的姓名重新设置为({name})")
+                );
+                DisplayTheInformationOfSuccessfully();
+                return;
             }
         }
 
@@ -581,7 +574,7 @@ namespace Sebastien.ClassManager.Core
         {
             try
             {
-                ht.AddStudent();
+                ht?.AddStudent();
             }
             catch (NullReferenceException ex) when (ex.Message.Equals("Account is Empty"))
             {
@@ -599,8 +592,8 @@ namespace Sebastien.ClassManager.Core
         public static void AddStudent(this HeadTeacher ht)
         {
             Write("账号: ");
-            String account = ReadLine();
-            if (account.Contains(" ") || account.Equals(String.Empty))
+            var account = ReadLine();
+            if (account.Contains(" ") || account.Equals(string.Empty))
             {
                 throw new NullReferenceException("Account is Empty");
             }
@@ -612,14 +605,14 @@ namespace Sebastien.ClassManager.Core
             }
 
             Write("密码: ");
-            String passwd = EnterPasswd();
-            if (passwd.Contains(" ") || passwd.Equals(String.Empty))
+            var passwd = EnterPasswd();
+            if (passwd.Contains(" ") || passwd.Equals(string.Empty))
             {
                 throw new NullReferenceException("Passwd is Empty");
             }
 
             Write("姓名: ");
-            String name = ReadLine();
+            var name = ReadLine();
             InformationLibrary.StudentLibrary.Add(new Student(account, passwd, name));
             InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"注册了一个学生账户({account})"));
             ht.ReleaseNewMsg(new Message("班主任", $"班里来了一位新同学({account}), 快去看看吧~"));
@@ -648,10 +641,10 @@ namespace Sebastien.ClassManager.Core
                 DisplayTheInformationOfErrorCode(ErrorCode.ArgumentError);
             }
         }
+
         /// <summary>
         /// 添加/注册新老师
         /// </summary>
-        /// <param name="info">所有用户信息库</param>
         public static void AddTeacher(this HeadTeacher ht)
         {
             WriteLine("你想创建哪一科目的任课教师? (选择: 上/下方向键   确定: 回车键) ");
@@ -679,7 +672,7 @@ namespace Sebastien.ClassManager.Core
             #endregion
 
             dynamic dm = Client.GetSelectorObject(
-                                            new List<String>()
+                                            info: new List<string>
                                             {
                                                 "C语言任课老师",
                                                 "C++任课老师",
@@ -688,7 +681,7 @@ namespace Sebastien.ClassManager.Core
                                                 "Java任课老师",
                                                 "SQL数据库任课老师"
                                             },
-                                          new[]
+                                          selects: new[]
                                           {
                                                  Subject.C,
                                                  Subject.CPlusPlus,
@@ -700,8 +693,8 @@ namespace Sebastien.ClassManager.Core
             Subject result = dm.GetSelect();
 
             Write("账号: ");
-            String account = ReadLine();
-            if (account.Contains(" ") || account.Equals(String.Empty))
+            var account = ReadLine();
+            if (account.Contains(" ") || account.Equals(string.Empty))
             {
                 throw new NullReferenceException("Account is Empty");
             }
@@ -712,18 +705,18 @@ namespace Sebastien.ClassManager.Core
             }
 
             Write("密码: ");
-            String passwd = EnterPasswd();
-            if (passwd.Contains(" ") || passwd.Equals(String.Empty))
+            var passwd = EnterPasswd();
+            if (passwd.Contains(" ") || passwd.Equals(string.Empty))
             {
                 throw new NullReferenceException("Passwd is Empty");
             }
 
             Write("姓名: ");
-            String name = ReadLine();
+            var name = ReadLine();
 
             WriteLine("此用户从哪一年开始从事该行业？");
             Write("> ");
-            if (!Int32.TryParse(ReadLine(), out Int32 years))
+            if (!int.TryParse(ReadLine(), out var years))
             {
                 throw new ArgumentException();
             }
@@ -767,12 +760,13 @@ namespace Sebastien.ClassManager.Core
         public static void ChangeScore(this Instructor curr)
         {
             Write("请输入将要修改的学生的账户: ");
-            String account = ReadLine();
+            var account = ReadLine();
+            if (InformationLibrary.StudentLibrary == null) return;
             Student temp = InformationLibrary.StudentLibrary
-                .Find(s => s.Account == account) as Student
-                ?? throw new NullReferenceException();
+                           .Find(s => s.Account == account)
+                           ?? throw new NullReferenceException();
             Write("分数: ");
-            temp[curr.TeachingRange] = Double.Parse(ReadLine());
+            temp[curr.TeachingRange] = double.Parse(ReadLine());
             curr.AddHistory(new Message("你", $"修改了{account}的分数: {temp[curr.TeachingRange]}"));
         }
         /// <summary>
@@ -781,39 +775,44 @@ namespace Sebastien.ClassManager.Core
         public static void RemoveAccount(this HeadTeacher ht)
         {
             Write("请输入将要移除的账户：");
-            String account = ReadLine();
-            for (Int32 index = 0; index < InformationLibrary.StudentLibrary.Count; ++index)
+            var account = ReadLine();
+
             {
-                if (account == InformationLibrary.StudentLibrary[index].Account)
+                Student student = InformationLibrary.StudentLibrary.Find(stu => stu.Account == account);
+                if (student != null)
                 {
                     Write("确定要删除吗？(Y/N) : ");
-                    InformationLibrary.StudentLibrary[index].ViewPersonalInformation();
-                    String result = ReadLine();
-                    if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
+                    student.ViewPersonalInformation();
+                    var result = ReadLine();
+                    if (result.Equals("y")
+                        || result.Equals("Y")
+                        || result.Equals(string.Empty))
                     {
-                        InformationLibrary.StudentLibrary.RemoveAt(index);
+                        InformationLibrary.StudentLibrary.Remove(student);
                         InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个学生账户({account})"));
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
                 }
             }
-            for (Int32 index = 0; index < InformationLibrary.TeacherLibrary.Count; ++index)
+
             {
-                if (account == InformationLibrary.TeacherLibrary[index].Account)
+                Instructor teacher = InformationLibrary.TeacherLibrary.Find(t => t.Account == account);
+                if (teacher != null)
                 {
                     Write("确定要删除吗？(Y/N) : ");
-                    InformationLibrary.TeacherLibrary[index].ViewPersonalInformation();
-                    String result = ReadLine();
-                    if (result.Equals("y") || result.Equals("Y") || result.Equals(String.Empty))
+                    teacher.ViewPersonalInformation();
+                    var result = ReadLine();
+                    if (result.Equals("y") || result.Equals("Y") || result.Equals(string.Empty))
                     {
-                        InformationLibrary.TeacherLibrary.RemoveAt(index);
+                        InformationLibrary.TeacherLibrary.Remove(teacher);
                         InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", $"删除了一个教师账户({account})"));
                         DisplayTheInformationOfSuccessfully();
                     }
                     return;
                 }
             }
+
             DisplayTheInformationOfErrorCode(ErrorCode.CantFindThisAccount, account);
         }
         #endregion
@@ -870,9 +869,9 @@ namespace Sebastien.ClassManager.Core
         /// 获取用户输入的密码
         /// </summary>
         /// <returns>密码</returns>
-        public static String EnterPasswd()
+        public static string EnterPasswd()
         {
-            String key = String.Empty;
+            var key = string.Empty;
             ConsoleKeyInfo keyInfo;
             while (true)
             {
@@ -897,7 +896,7 @@ namespace Sebastien.ClassManager.Core
                     }
 
                     key += keyInfo.KeyChar.ToString();
-                    Write($"*");
+                    Write("*");
                 }
             }
             WriteLine();
@@ -907,12 +906,12 @@ namespace Sebastien.ClassManager.Core
         /// 获取登录信息
         /// </summary>
         /// <returns>登录信息</returns>
-        public static Tuple<String, String> GetInformationForLogin()
+        public static Tuple<string, string> GetInformationForLogin()
         {
             Write("账号: ");
-            String account = ReadLine();
+            var account = ReadLine();
             Write("密码: ");
-            String passwd = EnterPasswd();
+            var passwd = EnterPasswd();
             return Tuple.Create(account, passwd);
         }
 
@@ -921,7 +920,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="errorCode">错误代码</param>
         /// <param name="parameter">错误参数信息</param>
-        public static void DisplayTheInformationOfErrorCode(ErrorCode code, String parameter = "parameter")
+        public static void DisplayTheInformationOfErrorCode(ErrorCode code, string parameter = "parameter")
         {
             BackgroundColor = ConsoleColor.Black;
             ForegroundColor = ConsoleColor.DarkRed;
@@ -977,7 +976,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 操作成功提示
         /// </summary>
-        public static void DisplayTheInformationOfSuccessfully(String msg = "(已完成)")
+        public static void DisplayTheInformationOfSuccessfully(string msg = "(已完成)")
         {
             //BackgroundColor = ConsoleColor.Black;
             //ForegroundColor = ConsoleColor.Green;
@@ -992,37 +991,12 @@ namespace Sebastien.ClassManager.Core
         /// <param name="msg">字符串</param>
         /// <param name="bg">背景颜色</param>
         /// <param name="fg">前景颜色</param>
-        public static void PrintColorMsg(String msg, ConsoleColor bg, ConsoleColor fg)
+        public static void PrintColorMsg(string msg, ConsoleColor bg, ConsoleColor fg)
         {
             BackgroundColor = bg;
             ForegroundColor = fg;
             Write(msg);
             DefaultColor();
-        }
-        /// <summary>
-        /// 将班主任信息保存到文件
-        /// </summary>
-        public static void SaveHeadTeacher()
-        {
-            FileStream output = File.OpenWrite(Client.FileName);
-            using (var writer = new BinaryWriter(output))
-            {
-                writer.Write(InformationLibrary.HeadTeacherUser.Account);
-                writer.Write(InformationLibrary.HeadTeacherUser.Passwd);
-                writer.Write(InformationLibrary.HeadTeacherUser.Name);
-                writer.Write(InformationLibrary.HeadTeacherUser.Age);
-            }
-        }
-        /// <summary>
-        /// 从文件读取班主任信息
-        /// </summary>
-        public static void ReadHeadTeacher()
-        {
-            FileStream input = File.OpenRead(Client.FileName);
-            using (var reader = new BinaryReader(input))
-            {
-                WriteLine($"Account: {reader.ReadString()}, Passwd: {reader.ReadString()}, Name: {reader.ReadString()}, Age: {reader.ReadInt32()}");
-            }
         }
     }
 }

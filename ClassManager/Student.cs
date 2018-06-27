@@ -15,7 +15,7 @@ namespace Sebastien.ClassManager.Core
     /// 学生用户类
     /// </summary>
     public sealed class Student  
-        : User, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
+        : UserCore, IComparable, IComparable<Student>, IFormattable, IEnumerable, IWeakEventListener
     {
         /// <summary>
         /// 成绩
@@ -30,11 +30,11 @@ namespace Sebastien.ClassManager.Core
         {
             get
             {
-                if ((Int32)index > _score.Length || index < 0)
+                if ((int)index > this._score.Length || index < 0)
                 {
                     throw new IndexOutOfRangeException("索引越界");
                 }
-                return _score[(Int32)index];
+                return this._score[(int)index];
             }
             set
             {
@@ -42,13 +42,13 @@ namespace Sebastien.ClassManager.Core
                 {
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
-                _score[(Int32)index] = value;
+                this._score[(int)index] = value;
             }
         }
         /// <summary>
         /// 是否有新消息
         /// </summary>
-        public Boolean HasNewMsg => NewMsg.Count > 0;
+        public Boolean HasNewMsg => this.NewMsg.Count > 0;
         /// <summary>
         /// 新消息
         /// </summary>
@@ -56,7 +56,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 消息内容
         /// </summary>
-        private List<Message> AllNews { get; } = new List<Message>();
+        public List<Message> AllNews { get; } = new List<Message>();
         /// <summary>
         /// 订阅状态
         /// </summary>
@@ -78,9 +78,9 @@ namespace Sebastien.ClassManager.Core
         public Student(Student stu) : base(stu)
         {
             //TODO:
-            for (Int32 index = 0; index < _score.Length; ++index)
+            for (var index = 0; index < this._score.Length; ++index)
             {
-                _score[index] = stu[(Subject)index];
+                this._score[index] = stu[(Subject)index];
             }
         }
 
@@ -90,7 +90,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
-        public Student(String account, String passwd, String name)
+        public Student(string account, string passwd, string name)
             : base(account, passwd, name, Identity.Student)
         {
         }
@@ -105,7 +105,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Student(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType = Identity.Student)
+        public Student(string account, string passwd, string name, TheSex sex, int age, string address, Identity userType = Identity.Student)
             : base(account, passwd, name, sex, age, address, userType)
         {
 
@@ -115,7 +115,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public async void SubscriptionToHeadTeacher(Teacher teacher)
         {
-            if (IsSubscription)
+            if (this.IsSubscription)
             {
                 Ui.DisplayTheInformationOfErrorCode(ErrorCode.DuplicateSubscriptions);
             }
@@ -123,8 +123,8 @@ namespace Sebastien.ClassManager.Core
             {
                 await Task.Run(() =>
                 {
-                    WeakEventManager<Teacher, Message>.AddHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum);
-                    IsSubscription = true;
+                    WeakEventManager<Teacher, Message>.AddHandler(teacher, nameof(teacher.NewMsg), this.ReceiveNewCurriculum);
+                    this.IsSubscription = true;
                 });
                 Ui.DisplayTheInformationOfSuccessfully("(订阅成功)");
             }
@@ -134,7 +134,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public async void UnsubscribeToHeadTeacher(Teacher teacher)
         {
-            if (! IsSubscription)
+            if (!this.IsSubscription)
             {
                 Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotSubscribedYet);
             }
@@ -142,10 +142,10 @@ namespace Sebastien.ClassManager.Core
             {
                 await Task.Run(() => 
                         WeakEventManager<Teacher, Message>
-                        .RemoveHandler(teacher, nameof(teacher.NewMsg), ReceiveNewCurriculum)
+                        .RemoveHandler(teacher, nameof(teacher.NewMsg), this.ReceiveNewCurriculum)
                     );
                 Ui.DisplayTheInformationOfSuccessfully("取消订阅成功");
-                IsSubscription = false;
+                this.IsSubscription = false;
             }
         }
         /// <summary>
@@ -153,21 +153,21 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public Int32 CompareTo(Object other) => CompareTo(other as Student);
+        public int CompareTo(object other) => CompareTo(other as Student);
         /// <summary>
         /// 实现IComparable<Student>接口
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public Int32 CompareTo(Student other) => GetTotalScore() < other.GetTotalScore() ? 1 : -1;
+        public int CompareTo(Student other) => GetTotalScore() < other.GetTotalScore() ? 1 : -1;
         /// <summary>
         /// 获取总成绩
         /// </summary>
         /// <returns>总成绩</returns>
         public Double GetTotalScore()
         {
-            Double sum = default(Double);
-            foreach (Double? index in _score)
+            var sum = default(Double);
+            foreach (var index in this._score)
             {
                 sum += index ?? 0;
             }
@@ -190,21 +190,21 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="msg"></param>
-        private void ReceiveNewCurriculum(Object sender, Message msg) => NewMsg.Enqueue(msg);
+        private void ReceiveNewCurriculum(object sender, Message msg) => this.NewMsg.Enqueue(msg);
 
         /// <summary>
         /// 查看新消息
         /// </summary>
         public void ViewNews()
         {
-            if (HasNewMsg)
+            if (this.HasNewMsg)
             {
-                for (Int32 index = 0; index < NewMsg.Count; ++index)
+                for (var index = 0; index < this.NewMsg.Count; ++index)
                 {
-                    Message msg = NewMsg.Dequeue();
+                    Message msg = this.NewMsg.Dequeue();
                     Ui.PrintColorMsg(msg.ToString(), ConsoleColor.Black, ConsoleColor.DarkMagenta);
-                    NewMsg.TrimExcess();
-                    AllNews.Add(msg);
+                    this.NewMsg.TrimExcess();
+                    this.AllNews.Add(msg);
                     WriteLine();
                 }
             }
@@ -218,7 +218,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public void ViewTotalNews()
         {
-            foreach (Message index in AllNews)
+            foreach (Message index in this.AllNews)
             {
                 WriteLine(index);
             }
@@ -229,10 +229,10 @@ namespace Sebastien.ClassManager.Core
         /// <param name="format"></param>
         /// <param name="formatProvider"></param>
         /// <returns></returns>
-        public String ToString(String format, IFormatProvider formatProvider)
+        public string ToString(string format, IFormatProvider formatProvider)
         {
             var score = new StringBuilder();
-            foreach (Double? index in _score)
+            foreach (var index in this._score)
             {
                 score.Append($"{index,-10}");
             }
@@ -246,18 +246,18 @@ namespace Sebastien.ClassManager.Core
                 case "S":
                     return score.ToString();
                 case "P":
-                    return $"{Name,-10} {Sex,-10} {Age,-10}";
+                    return $"{this.Name,-10} {this.Sex,-10} {this.Age,-10}";
                 default:
                     throw new FormatException("Invalid format");
             }
         }
-        public String ToString(String format) => ToString(format, null);
+        public string ToString(string format) => ToString(format, null);
         /// <inheritdoc />
         /// <summary>
         /// 实现IEnumerable接口
         /// </summary>
         /// <returns></returns>
-        public IEnumerator GetEnumerator() => new StudentIEnumerator(_score);
+        public IEnumerator GetEnumerator() => new StudentIEnumerator(this._score);
         /// <inheritdoc />
         /// <summary>
         /// 弱事件处理程序
@@ -266,7 +266,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Boolean ReceiveWeakEvent(Type managerType, Object sender, EventArgs e)
+        public Boolean ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
         {
             ReceiveNewCurriculum(sender, e as Message);
             return true;
@@ -284,26 +284,26 @@ namespace Sebastien.ClassManager.Core
             /// <summary>
             /// 当前索引
             /// </summary>
-            private Int32 _position;
+            private int _position;
             /// <summary>
             /// 构造函数
             /// </summary>
             /// <param name="score"></param>
             public StudentIEnumerator(Double?[] score)
             {
-                _iscore = score;
-                _position = -1;
+                this._iscore = score;
+                this._position = -1;
             }
             /// <summary>
             /// 当前元素
             /// </summary>
-            public Object Current => _iscore[_position];
+            public object Current => this._iscore[this._position];
             /// <inheritdoc />
             /// <summary>
             /// 移动到下一元素
             /// </summary>
             /// <returns></returns>
-            public Boolean MoveNext() => (++_position < _iscore.Length);
+            public Boolean MoveNext() => (++this._position < this._iscore.Length);
             /// <inheritdoc />
             /// <summary>
             /// 重置当前元素
@@ -328,7 +328,7 @@ namespace Sebastien.ClassManager.Core
             /// <param name="x">用于比较的第一个学生对象</param>
             /// <param name="y">用于比较的第二个学生对象</param>
             /// <returns>比较结果</returns>
-            public Int32 Compare(Student x, Student y) => x[_sortWay] > y[_sortWay] ? 1 : -1;
+            public int Compare(Student x, Student y) => x[this._sortWay] > y[this._sortWay] ? 1 : -1;
         }
     }
 }

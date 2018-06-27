@@ -19,6 +19,6 @@ namespace Sebastien.ClassManager.Core
         /// 显示此分数以上的所有学生
         /// </summary>
         /// <param name="score">指定分数</param>
-        void GetStuHighThan(Int32 score);
+        void GetStuHighThan(int score);
     }
 }

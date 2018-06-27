@@ -7,12 +7,12 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 老师抽象基类
     /// </summary>
-    public abstract class Teacher : User
+    public abstract class Teacher : UserCore
     {
         /// <summary>
         /// 从业年份
         /// </summary>
-        public Int32 YearsOfProfessional { get; }
+        public int YearsOfProfessional { get; }
         /// <summary>
         /// 事件: 发布通知
         /// </summary>
@@ -32,7 +32,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <param name="passwd">密码</param>
         /// <param name="userType">用户类型</param>
-        public Teacher(String account, String passwd, String name, Int32 years, Identity userType = Identity.Instructor)
+        public Teacher(string account, string passwd, string name, int years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, userType) => YearsOfProfessional = years;
         /// <summary>
         /// 构造函数
@@ -44,7 +44,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        public Teacher(String account, String passwd, String name, TheSex sex, Int32 age, String address, Int32 years, Identity userType = Identity.Instructor)
+        public Teacher(string account, string passwd, string name, TheSex sex, int age, string address, int years, Identity userType = Identity.Instructor)
             : base(account, passwd, name, sex, age, address, userType) => YearsOfProfessional = years;
         /// <summary>
         /// 发布新通知
@@ -57,6 +57,6 @@ namespace Sebastien.ClassManager.Core
         /// 重写用户基类的ToString()方法
         /// </summary>
         /// <returns></returns>
-        public override String ToString() => $"{base.ToString()}从业年份: {YearsOfProfessional}\n";
+        public override string ToString() => $"{base.ToString()}从业年份: {this.YearsOfProfessional}\n";
     }
 }

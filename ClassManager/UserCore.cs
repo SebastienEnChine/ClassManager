@@ -15,33 +15,33 @@ namespace Sebastien.ClassManager.Core
     /// <summary>
     /// 用于查找用户账号是否重复
     /// </summary>
-    public class FindAccount<T> where T : User
+    public class FindAccount<T> where T : UserCore
     {
         /// <summary>
         /// 账号
         /// </summary>
-        private readonly String _account; 
+        private readonly string _account; 
         /// <summary>
         /// 查找方式
         /// </summary>
         /// <param name="account">账号</param>
-        public FindAccount(String account) => _account = account;
+        public FindAccount(string account) => _account = account;
         /// <summary>
         /// 比较账号是否重复
         /// </summary>
         /// <param name="other">比较目标</param>
         /// <returns>true: 重复 false: 不重复</returns>
-        public Boolean FindAccountPredicate(T other) => other?.Account == _account;
+        public Boolean FindAccountPredicate(T other) => other?.Account == this._account;
     }
     /// <summary>
     /// 用户抽象基类
     /// </summary>
-    public abstract class User
+    public abstract class UserCore
     {
         /// <summary>
         /// 默认构造函数
         /// </summary>
-        protected User()
+        protected UserCore()
         {
         }
         /// <inheritdoc />
@@ -49,7 +49,7 @@ namespace Sebastien.ClassManager.Core
         /// 复制构造函数
         /// </summary>
         /// <param name="user">用户对象</param>
-        protected User(User user)
+        protected UserCore(UserCore user)
             : this(user.Account, user.Passwd, user.Name, user.Sex, user.Age, user.Address, user.UserType)
         {
             //. . . 
@@ -62,12 +62,12 @@ namespace Sebastien.ClassManager.Core
         /// <param name="passwd">密码</param>
         /// <param name="name"></param>
         /// <param name="userType">用户类型</param>
-        protected User(String account, String passwd, String name, Identity userType)
+        protected UserCore(string account, string passwd, string name, Identity userType)
         {
-            Account = account;
-            Passwd = passwd;
-            Name = name;
-            UserType = userType;
+            this.Account = account;
+            this.Passwd = passwd;
+            this.Name = name;
+            this.UserType = userType;
         }
         /// <inheritdoc />
         /// <summary>
@@ -80,22 +80,22 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sex">性别</param>
         /// <param name="age">年龄</param>
         /// <param name="address">地址</param>
-        protected User(String account, String passwd, String name, TheSex sex, Int32 age, String address, Identity userType)
+        protected UserCore(string account, string passwd, string name, TheSex sex, int age, string address, Identity userType)
             : this(account, passwd, name, userType)
         {
-            Sex = sex;
-            _age = age;
-            Address = address;
+            this.Sex = sex;
+            this._age = age;
+            this.Address = address;
         }
 
         /// <summary>
         /// 登录计时任务取消令牌
         /// </summary>
-        protected CancellationTokenSource _cts = default(CancellationTokenSource);
+        protected CancellationTokenSource _cts = default;
         /// <summary>
         /// 登录管道输出
         /// </summary>
-        public static readonly BufferBlock<User> Result = new BufferBlock<User>();
+        public static readonly BufferBlock<UserCore> Result = new BufferBlock<UserCore>();
         /// <summary>
         /// 计时器
         /// </summary>
@@ -104,11 +104,11 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 账号
         /// </summary>
-        public String Account { get; }
+        public string Account { get; }
         /// <summary>
         /// 密码
         /// </summary>
-        public String Passwd { get; set; }
+        public string Passwd { get; set; }
         /// <summary>
         /// 用户类型
         /// </summary>
@@ -116,11 +116,11 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreatedTime { get; } = DateTime.Now;
+        public DateTime CreatedTime { get; set; } = DateTime.Now;
         /// <summary>
         /// 姓名
         /// </summary>
-        public String Name { get; set; }
+        public string Name { get; set; }
         /// <summary>
         /// 性别
         /// </summary>
@@ -128,24 +128,23 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 年龄
         /// </summary>
-        protected Int32 _age;
-        public Int32 Age
+        protected int _age;
+        public int Age
         {
-            get => _age;
+            get => this._age;
             set
             {
                 if (value > 100 || value < 10)
                 {
                     throw new ArgumentOutOfRangeException("参数超出范围");
                 }
-                _age = value;
-                Ui.SaveHeadTeacher();
+                this._age = value;
             }
         }
         /// <summary>
         /// 地址
         /// </summary>
-        public String Address { private get; set; }
+        public string Address { get; set; } = "中国";
         /// <summary>
         /// 操作记录
         /// </summary>
@@ -154,7 +153,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 注销登录
         /// </summary>
-        public void LogOut() => _cts?.Cancel();
+        public void LogOut() => this._cts?.Cancel();
         /// <summary>
         /// 登录计时(异常处理)
         /// </summary>
@@ -166,7 +165,7 @@ namespace Sebastien.ClassManager.Core
             }
             catch (OperationCanceledException)
             {
-                AddHistory(new Message("此次上线时间", $"[{_sw.Elapsed.Hours:00}:{_sw.Elapsed.Minutes:00}:{_sw.Elapsed.Seconds:00}]"));
+                AddHistory(new Message("此次上线时间", $"[{this._sw.Elapsed.Hours:00}:{this._sw.Elapsed.Minutes:00}:{this._sw.Elapsed.Seconds:00}]"));
             }
         }
         /// <summary>
@@ -175,18 +174,18 @@ namespace Sebastien.ClassManager.Core
         /// <returns></returns>
         protected Task Timing()
         {
-            _cts = new CancellationTokenSource();
-            _sw = new Stopwatch();
-            _sw.Start();
+            this._cts = new CancellationTokenSource();
+            this._sw = new Stopwatch();
+            this._sw.Start();
             return new Task(() =>
             {
                 while (true)
                  {
-                    if (_cts.IsCancellationRequested)
+                    if (this._cts.IsCancellationRequested)
                     {
-                        _sw.Stop();
-                        _cts = null;
-                        _sw = null;
+                        this._sw.Stop();
+                        this._cts = null;
+                        this._sw = null;
                         throw new OperationCanceledException();
                     }
                     //_cts.Token.ThrowIfCancellationRequested();
@@ -196,10 +195,10 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 登录动作管道
         /// </summary>
-        public static ITargetBlock<Func<Tuple<String, String>>> LoginWithBlock()
+        public static ITargetBlock<Func<Tuple<string, string>>> LoginWithBlock()
         {
-            var loginInfo = new TransformBlock<Func<Tuple<String, String>>, Tuple<String, String>>(info => info?.Invoke());
-            var isAUser = new TransformBlock<Tuple<String, String>, User>(info => Client.IdentityCheck(info));
+            var loginInfo = new TransformBlock<Func<Tuple<string, string>>, Tuple<string, string>>(info => info?.Invoke());
+            var isAUser = new TransformBlock<Tuple<string, string>, UserCore>(info => Client.IdentityCheck(info));
 
             loginInfo.LinkTo(isAUser);
             isAUser.LinkTo(Result);
@@ -209,11 +208,11 @@ namespace Sebastien.ClassManager.Core
         /// 登录
         /// </summary>
         /// <returns>User: sucessfully, null: faild</returns>
-        public static User Login()
+        public static UserCore Login()
         {
-            ITargetBlock<Func<Tuple<String, String>>> result = LoginWithBlock();
+            ITargetBlock<Func<Tuple<string, string>>> result = LoginWithBlock();
             result.Post(Ui.GetInformationForLogin);
-            User user = Result.Receive();
+            UserCore user = Result.Receive();
             //User user = Client.IdentityCheck(UI.GetInformationForLogin());
             if (user == null)
             {
@@ -232,9 +231,9 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 切换用户
         /// </summary>
-        public User SwitchUser()
+        public UserCore SwitchUser()
         {
-            User user = Login();
+            UserCore user = Login();
             if (user != null)
             {
                 LogOut();
@@ -255,19 +254,19 @@ namespace Sebastien.ClassManager.Core
         /// 向操作记录中添加新的操作信息
         /// </summary>
         /// <param name="message"></param>
-        public async void AddHistory(Message message) => await Task.Run(() => History.Add(message));
+        public async void AddHistory(Message message) => await Task.Run(() => this.History.Add(message));
 
         /// <summary>
         /// 获取全部操作记录
         /// </summary>
         /// <returns></returns>
-        public List<Message> GetHistory() => History;
+        public List<Message> GetHistory() => this.History;
         /// <summary>
         /// 重写ToString()方法
         /// </summary>
         /// <returns></returns>
-        public override String ToString()
-                        => $"账户: {Account}\n账户类型:{UserType}\n账户创建时间: {CreatedTime}\n姓名: {Name}\n性别: {Sex}\n年龄: {Age}\n地址: {Address}\n";
+        public override string ToString()
+                        => $"账户: {this.Account}\n账户类型:{this.UserType}\n账户创建时间: {this.CreatedTime}\n姓名: {this.Name}\n性别: {this.Sex}\n年龄: {this.Age}\n地址: {this.Address}\n";
         /// <summary>
         /// 个人信息概览
         /// </summary>
@@ -279,7 +278,7 @@ namespace Sebastien.ClassManager.Core
         public  void LeaveAMessage()
         {
             Write("请输入你想说的话: > ");
-            String msg = $"[{DateTime.Now.ToLocalTime()}] {Name,-15} : {ReadLine()}{Environment.NewLine}";
+            var msg = $"[{DateTime.Now.ToLocalTime()}] {this.Name,-15} : {ReadLine()}{Environment.NewLine}";
 
             AddHistory(new Message("你", $"[公共留言墙留言]: {msg}"));
             //using (FileStream inputStream = File.OpenWrite(Client.FileName))
@@ -356,7 +355,7 @@ namespace Sebastien.ClassManager.Core
         /// 发送Http请求(调用和异常处理)
         /// </summary>
         /// <param name="url"></param>
-        public async void CallGetInfoOfUrl(String url)
+        public async void CallGetInfoOfUrl(string url)
         {
             try
             {
@@ -376,15 +375,15 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public async Task GetInfoOfUrl(String url)
+        public async Task GetInfoOfUrl(string url)
         {
             using (var client = new HttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    String httpText = await response.Content.ReadAsStringAsync();
-                    String savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{url.Split('.')[1]}.html");
+                    var httpText = await response.Content.ReadAsStringAsync();
+                    var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{url.Split('.')[1]}.html");
                     File.WriteAllText(savePath, httpText);
                     await Task.Delay(5000); //模拟耗时请求
                     Ui.DisplayTheInformationOfSuccessfully($"请求已被响应! 网页已被保存到: 我的文档\\{url.Split('.')[1]}.html");

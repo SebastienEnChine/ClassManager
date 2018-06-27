@@ -22,7 +22,7 @@ namespace MySelector
         /// 构造函数
         /// </summary>
         /// <param name="message">异常信息</param>
-        public SelectorException(String message)
+        public SelectorException(string message)
             : base(message)
         {
 
@@ -32,7 +32,7 @@ namespace MySelector
         /// </summary>
         /// <param name="message">异常信息</param>
         /// <param name="innerException">源异常</param>
-        public SelectorException(String message, Exception innerException)
+        public SelectorException(string message, Exception innerException)
             : base(message, innerException)
         {
 
@@ -68,11 +68,11 @@ namespace MySelector
         /// <summary>
         /// 选项显示信息
         /// </summary>
-        public ImmutableList<String> TheInfomationOfSelect { get; set; }
+        public ImmutableList<string> TheInfomationOfSelect { get; set; }
         /// <summary>
         /// 选中项索引
         /// </summary>
-        private Int32 _mainIndex;
+        private int _mainIndex;
 
         /// <summary>
         /// 构造函数
@@ -81,7 +81,7 @@ namespace MySelector
         /// <param name="select">选项</param>
         ///<exception cref="NullReferenceException">info或select为null时引发此异常</exception>
         ///<exception cref="SelectorException">info和select长度不匹配时引发此异常</exception>
-        public Selector(List<String> info, params T[] select)
+        public Selector(List<string> info, params T[] select)
         {
             if (info == null || select == null)
             {
@@ -91,8 +91,8 @@ namespace MySelector
             {
                 throw new SelectorException();
             }
-            Select = select.ToImmutableList();
-            TheInfomationOfSelect = info.ToImmutableList();
+            this.Select = select.ToImmutableList();
+            this.TheInfomationOfSelect = info.ToImmutableList();
         }
 
         /// <summary>
@@ -112,15 +112,15 @@ namespace MySelector
                 switch (info.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        if (_mainIndex > 0)
+                        if (this._mainIndex > 0)
                         {
-                            --_mainIndex;
+                            --this._mainIndex;
                         }
                         break;
                     case ConsoleKey.DownArrow:
-                        if (_mainIndex < Select.Count - 1)
+                        if (this._mainIndex < this.Select.Count - 1)
                         {
-                            ++_mainIndex;
+                            ++this._mainIndex;
                         }
                         break;
                     case ConsoleKey.Enter:
@@ -128,12 +128,12 @@ namespace MySelector
                         Console.BackgroundColor = oldbg;
                         Console.ForegroundColor = oldfg;
 
-                        return Select[_mainIndex];
+                        return this.Select[this._mainIndex];
                     default:
                         break;
                 }
 
-                Console.SetCursorPosition(0, Console.CursorTop - Select.Count);
+                Console.SetCursorPosition(0, Console.CursorTop - this.Select.Count);
             } while (true);
         }
         /// <summary>
@@ -141,32 +141,32 @@ namespace MySelector
         /// </summary>
         private void DisplayTheInfomationOfSelect()
         {
-            for (var index = 0; index < TheInfomationOfSelect.Count; ++index)
+            for (var index = 0; index < this.TheInfomationOfSelect.Count; ++index)
             {
-                if (_mainIndex == index)
+                if (this._mainIndex == index)
                 {
                     SetSelectColor();
-                    Console.Write($"{"",-10}{TheInfomationOfSelect[index]}");
+                    Console.Write($"{"",-10}{this.TheInfomationOfSelect[index]}");
                     SetColor();
                     Console.WriteLine(".");
                 }
                 else
                 {
-                    Console.WriteLine($"{" ",-10}{TheInfomationOfSelect[index]}");
+                    Console.WriteLine($"{" ",-10}{this.TheInfomationOfSelect[index]}");
                 }
             }
 
             //默认颜色设置
             void SetColor()
             {
-                Console.BackgroundColor = UnselectedBackground;
-                Console.ForegroundColor = UnselectedForeground;
+                Console.BackgroundColor = this.UnselectedBackground;
+                Console.ForegroundColor = this.UnselectedForeground;
             }
             //焦点颜色设置
             void SetSelectColor()
             {
-                Console.BackgroundColor = SelectedBackground;
-                Console.ForegroundColor = SelectedForeground;
+                Console.BackgroundColor = this.SelectedBackground;
+                Console.ForegroundColor = this.SelectedForeground;
             }
         }
     }

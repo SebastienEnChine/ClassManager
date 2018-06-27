@@ -6,7 +6,7 @@ namespace DisplayInfo
 {
     class Program
     {
-        static void Main(String[] args)
+        static void Main(string[] args)
         {
             SetWindowSize(40, 5);
             BackgroundColor = ConsoleColor.Black;

@@ -17,7 +17,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 同步锁
         /// </summary>
-        private static readonly Object SyncRoot = new Object();
+        private static readonly object SyncRoot = new object();
         /// <summary>
         /// 此类型唯一的实例对象
         /// </summary>
@@ -37,7 +37,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="years"></param>
         /// <param name="userType">用户类型</param>
         /// <param name="name"></param>
-        private HeadTeacher(String account, String passwd, String name, Int32 years, Identity userType = Identity.HeadTeacher) 
+        private HeadTeacher(string account, string passwd, string name, int years, Identity userType = Identity.HeadTeacher) 
             : base(account, passwd, name, years, userType)
         {
 
@@ -51,7 +51,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="name"></param>
         /// <param name="years"></param>
         /// <returns>如果HeadTeacher不为null，返回HeadTeacher对象， 否则创建一个新的HeadTeacher对象作为返回值</returns>
-        public static HeadTeacher GetHeadTeacher(String account, String passwd, String name, Int32 years)
+        public static HeadTeacher GetHeadTeacher(string account, string passwd, string name, int years)
         {
             #region 一般实现
             //if (_ht == null)
@@ -118,7 +118,7 @@ namespace Sebastien.ClassManager.Core
         /// 显示此分数以上的所有学生
         /// </summary>
         /// <param name="score">指定分数</param>
-        public void GetStuHighThan(Int32 score)
+        public void GetStuHighThan(int score)
         {
             try
             {
@@ -155,9 +155,9 @@ namespace Sebastien.ClassManager.Core
             Curriculum NewCurriculum()
             {
                 var temp = new Curriculum();
-                for (Int32 line = 0; line < temp.Week; ++line)
+                for (var line = 0; line < temp.Week; ++line)
                 {
-                    for (Int32 row = 0; row < temp.Classes; ++row)
+                    for (var row = 0; row < temp.Classes; ++row)
                     {
                         temp[line, row] = new CurriculumContant(line.ToString(), row.ToString(), (ConsoleColor)rd.Next(14) + 1);
                     }

@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
+using System.Xml;
+using System.Text;
+using System.IO;
 
 #region 其他需求
 //其他: 
@@ -32,7 +35,7 @@ namespace Sebastien.ClassManager.Core
     /// </summary>
     public sealed class Client
     {
-        public static String FileName { get; } = @"D:\Document\TEXT\班级管理系统留言板";
+        public static string FileName { get; } = @"D:\Document\TEXT\班级管理系统留言板";
         /// <summary>
         /// 程序状态
         /// </summary>
@@ -43,14 +46,14 @@ namespace Sebastien.ClassManager.Core
         /// <returns>如果已经启动了此程序则为<see>true</see>, 否则为<see>false</see></returns>
         private static Boolean IsStarted()
         {
-            var mutex = new Mutex(false, "ClassManagerLock", out Boolean Started);
+            var mutex = new Mutex(false, "ClassManagerLock", out var Started);
             return Started;
         }
         /// <summary>
         /// 程序主逻辑
         /// </summary>
         /// <param name="args">命令行参数</param>
-        private static void Main(String[] args)
+        private static void Main(string[] args)
         {
             if (!IsStarted())
             {
@@ -63,14 +66,14 @@ namespace Sebastien.ClassManager.Core
             Ui.DefaultSetting();
             Ui.AboutThisApplication();
 
-            User currentUser;
+            UserCore currentUser;
             do
             {
-                currentUser = User.Login();
+                currentUser = UserCore.Login();
             } while (currentUser == null);
 
             while (_appState == State.On)
-             {
+            {
                 currentUser.Prompt();
                 switch (currentUser.UserType)
                 {
@@ -86,29 +89,27 @@ namespace Sebastien.ClassManager.Core
                     default:
                         throw new ArgumentException();
                 }
-             }
-            Ui.ReadHeadTeacher();
+            }
         }
 
         /// <summary>
         /// 加载选择器
         /// </summary>
         /// <returns>选择器对象</returns>
-        public static Object GetSelectorObject<T>(List<String> info, params T[] selects) //TODO:
+        public static object GetSelectorObject<T>(List<string> info, params T[] selects) //TODO:
         {
             var asm = Assembly.LoadFrom(@"D:\Document\Workspace\C_SHARP\ConsoleApps\ClassManager\SelectorLib\bin\Debug\SelectorLib.dll");
             Type coreTypeName = asm.GetType("MySelector.Selector`1"); //1为泛型类型个数, 如Test<T>类, 因此 如果是2, 则为: Test<T1, T2> 
             Type fullTypeName = coreTypeName.MakeGenericType(typeof(T));
-            return asm.CreateInstance(fullTypeName.FullName ?? throw new InvalidOperationException(), true, BindingFlags.Default, null, new Object[] { info, selects }, null, null);
+            return asm.CreateInstance(fullTypeName.FullName ?? throw new InvalidOperationException(), true, BindingFlags.Default, null, new object[] { info, selects }, null, null);
         }
-
         /// <summary>
         /// 获取由用户输入的命令
         /// </summary>
         /// <param name="input" />
         /// <param name="cmd">命令参数</param>
         /// <returns></returns>
-        public static String GetCmd(String input, out Command cmd)
+        public static string GetCmd(string input, out Command cmd)
         {
             if (Enum.TryParse(input, true, out cmd))
             {
@@ -124,9 +125,9 @@ namespace Sebastien.ClassManager.Core
         /// <param name="currentUser">当前用户</param>
         /// <param name="cmd">可执行命令</param>
         /// <returns></returns>
-        private static User RunForUser(User currentUser, Command cmd)
+        private static UserCore RunForUser(UserCore currentUser, Command cmd)
         {
-            User user = null;
+            UserCore user = null;
             switch (cmd)
             {
                 case Command.GetHelp:
@@ -183,13 +184,13 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="stu">学生用户</param>
         /// <returns>用户对象</returns>
-        private static User RunForStudent(Student stu)
+        private static UserCore RunForStudent(Student stu)
         {
             stu.TheTipsOfNews();
             ForegroundColor = ConsoleColor.Yellow;
-            String input = ReadLine();
+            var input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (String.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -198,7 +199,7 @@ namespace Sebastien.ClassManager.Core
             {
                 return null;
             }
-            User result = null;
+            UserCore result = null;
             switch (cmd)
             {
                 case Command.Exit:
@@ -249,12 +250,12 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="headTeacher">班主任用户</param>
         /// <returns>用户对象</returns>
-        private static User RunForTeacher(Instructor teacher)
+        private static UserCore RunForTeacher(Instructor teacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
-            String input = ReadLine();
+            var input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (String.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -263,7 +264,7 @@ namespace Sebastien.ClassManager.Core
             {
                 return null;
             }
-            User result = null;
+            UserCore result = null;
             switch (cmd)
             {
                 case Command.Exit:
@@ -314,12 +315,12 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="headTeacher"></param>
         /// <returns>用户对象</returns>
-        private static User RunForHeadTeacher(HeadTeacher headTeacher)
+        private static UserCore RunForHeadTeacher(HeadTeacher headTeacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
-            String input = ReadLine();
+            var input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
-            if (String.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return null;
             }
@@ -328,7 +329,7 @@ namespace Sebastien.ClassManager.Core
             {
                 return null;
             }
-            User result = null;
+            UserCore result = null;
             switch (cmd)
             {
                 case Command.Exit:
@@ -398,14 +399,14 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
         [Obsolete("方法已过期, 此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
-        public static User CheckAccountAvailabilityOldVersionAndNeedOtherClass(String account) //依赖于User.cs文件中的FindAccount <T> 类
+        public static UserCore CheckAccountAvailabilityOldVersionAndNeedOtherClass(string account) //依赖于User.cs文件中的FindAccount <T> 类
         {
-            Int32 index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
+            var index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
             if (index1 != -1)
             {
                 return InformationLibrary.StudentLibrary[index1];
             }
-            Int32 index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
+            var index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
             if (index2 != -1)
             {
                 return InformationLibrary.StudentLibrary[index2];
@@ -418,14 +419,14 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
         [Obsolete("方法已过期, 此方法使用Lambda表达式, 但同一表达式使用多次")]
-        public static User CheckAccountAvailabilityOldVersionLambda(String account)
+        public static UserCore CheckAccountAvailabilityOldVersionLambda(string account)
         {
-            Int32 index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
+            var index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
             if (index1 != -1)
             {
                 return InformationLibrary.StudentLibrary[index1];
             }
-            Int32 index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
+            var index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
             if (index2 != -1)
             {
                 return InformationLibrary.StudentLibrary[index2];
@@ -438,7 +439,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
         [Obsolete("方法已过期, 使用传统for循环的旧版本")]
-        public static User CheckAccountAvailabilityOldVersionNormal(String account)
+        public static UserCore CheckAccountAvailabilityOldVersionNormal(string account)
         {
             foreach (Student index in InformationLibrary.StudentLibrary)
             {
@@ -461,7 +462,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="account">账户</param>
         /// <returns>true: 不存在， false: 已存在</returns>
-        public static User CheckAccountAvailability(String account)
+        public static UserCore CheckAccountAvailability(string account)
         {
             Student student = InformationLibrary.StudentLibrary.Find(IsEquals);
             if (student != default(Student))
@@ -477,16 +478,16 @@ namespace Sebastien.ClassManager.Core
             return (IsEquals(InformationLibrary.HeadTeacherUser)) ? InformationLibrary.HeadTeacherUser : null;
 
             //Local Function For The Find() Method 
-            Boolean IsEquals(User u) => u.Account.Equals(account);
+            Boolean IsEquals(UserCore u) => u.Account.Equals(account);
         }
         /// <summary>
         /// 检查登录信息
         /// </summary>
         /// <param name="loginInformation">登录信息</param>
         /// <returns>用户对象</returns>
-        public static User IdentityCheck(Tuple<String, String> loginInformation)
+        public static UserCore IdentityCheck(Tuple<string, string> loginInformation)
         {
-            User result = CheckAccountAvailability(loginInformation.Item1);
+            UserCore result = CheckAccountAvailability(loginInformation.Item1);
             if (result == null)
             {
                 return null;

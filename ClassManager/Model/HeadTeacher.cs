@@ -99,10 +99,10 @@ namespace Sebastien.ClassManager.Core
         {
             if (isSort == State.On)
             {
-                InformationLibrary.StudentLibrary.Sort();
+                UserRepository.StudentLibrary.Sort();
             }
             uint row = 1;
-            foreach (var index in InformationLibrary.StudentLibrary)
+            foreach (Student index in UserRepository.StudentLibrary)
             { 
                 if (isDisplayRank == State.On)
                 {
@@ -126,11 +126,11 @@ namespace Sebastien.ClassManager.Core
                 {
                     throw new ArgumentException();
                 }
-                IEnumerable<Student> result = from s in InformationLibrary.StudentLibrary
+                IEnumerable<Student> result = from s in UserRepository.StudentLibrary
                                               where s.GetTotalScore() >= score
                                               select s;
                 WriteLine($"{"Name",-10}TotalScore");
-                foreach (var index in result)
+                foreach (Student index in result)
                 {
                     WriteLine($"{index.Name,-10}{index.GetTotalScore(),-10}");
                 }
@@ -155,9 +155,9 @@ namespace Sebastien.ClassManager.Core
             Curriculum NewCurriculum()
             {
                 var temp = new Curriculum();
-                for (var line = 0; line < temp.Week; ++line)
+                for (int line = 0; line < temp.Week; ++line)
                 {
-                    for (var row = 0; row < temp.Classes; ++row)
+                    for (int row = 0; row < temp.Classes; ++row)
                     {
                         temp[line, row] = new CurriculumContant(line.ToString(), row.ToString(), (ConsoleColor)rd.Next(14) + 1);
                     }
@@ -183,16 +183,16 @@ namespace Sebastien.ClassManager.Core
 
             await Task.Run(() =>
             {
-               if (InformationLibrary._curriculums[0] == null)
+               if (UserRepository._curriculums[0] == null)
                {
-                   InformationLibrary._curriculums[0] = cc;
+                   UserRepository._curriculums[0] = cc;
                }
                else
                {
-                   InformationLibrary._curriculums[1] = cc;
+                   UserRepository._curriculums[1] = cc;
                }
                ReleaseNewMsg(new Message("班主任", "发布了新课表, 快去看看吧~"));
-               InformationLibrary.HeadTeacherUser.AddHistory(new Message("你", "发布了新课表"));
+               UserRepository.HeadTeacherUser.AddHistory(new Message("你", "发布了新课表"));
                Ui.DisplayTheInformationOfSuccessfully();
            });
         }

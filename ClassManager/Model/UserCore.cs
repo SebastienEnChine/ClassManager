@@ -7,7 +7,6 @@ using System.Threading;
 using System.Diagnostics;
 using System.Threading.Tasks.Dataflow;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 
 namespace Sebastien.ClassManager.Core
@@ -31,7 +30,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="other">比较目标</param>
         /// <returns>true: 重复 false: 不重复</returns>
-        public Boolean FindAccountPredicate(T other) => other?.Account == this._account;
+        public bool FindAccountPredicate(T other) => other?.Account == this._account;
     }
     /// <summary>
     /// 用户抽象基类
@@ -245,10 +244,10 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public virtual void ViewTheInformationOfTheHeadteacher()
         {
-            WriteLine($"姓名: {InformationLibrary.HeadTeacherUser.Name}");
-            WriteLine($"性别: {InformationLibrary.HeadTeacherUser.Sex}");
-            WriteLine($"年龄: {InformationLibrary.HeadTeacherUser.Age}");
-            WriteLine($"从业年份: {InformationLibrary.HeadTeacherUser.YearsOfProfessional}");
+            WriteLine($"姓名: {UserRepository.HeadTeacherUser.Name}");
+            WriteLine($"性别: {UserRepository.HeadTeacherUser.Sex}");
+            WriteLine($"年龄: {UserRepository.HeadTeacherUser.Age}");
+            WriteLine($"从业年份: {UserRepository.HeadTeacherUser.YearsOfProfessional}");
         }
         /// <summary>
         /// 向操作记录中添加新的操作信息
@@ -278,7 +277,7 @@ namespace Sebastien.ClassManager.Core
         public  void LeaveAMessage()
         {
             Write("请输入你想说的话: > ");
-            var msg = $"[{DateTime.Now.ToLocalTime()}] {this.Name,-15} : {ReadLine()}{Environment.NewLine}";
+            string msg = $"[{DateTime.Now.ToLocalTime()}] {this.Name,-15} : {ReadLine()}{Environment.NewLine}";
 
             AddHistory(new Message("你", $"[公共留言墙留言]: {msg}"));
             //using (FileStream inputStream = File.OpenWrite(Client.FileName))
@@ -382,8 +381,8 @@ namespace Sebastien.ClassManager.Core
                 HttpResponseMessage response = await client.GetAsync(url);
                 if (response.IsSuccessStatusCode)
                 {
-                    var httpText = await response.Content.ReadAsStringAsync();
-                    var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{url.Split('.')[1]}.html");
+                    string httpText = await response.Content.ReadAsStringAsync();
+                    string savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{url.Split('.')[1]}.html");
                     File.WriteAllText(savePath, httpText);
                     await Task.Delay(5000); //模拟耗时请求
                     Ui.DisplayTheInformationOfSuccessfully($"请求已被响应! 网页已被保存到: 我的文档\\{url.Split('.')[1]}.html");

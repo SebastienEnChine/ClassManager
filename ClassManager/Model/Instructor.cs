@@ -61,7 +61,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         /// <param name="stu">学生</param>
         /// <returns>成绩</returns>
-        public Double? GetScoreOfThisStudent(Student stu) => stu[this.TeachingRange];
+        public double? GetScoreOfThisStudent(Student stu) => stu[this.TeachingRange];
         /// <summary>
         /// 显示学生成绩列表
         /// </summary>
@@ -75,10 +75,10 @@ namespace Sebastien.ClassManager.Core
             {
                 //(依赖于Student.cs文件中的StudentCompare类)
                 //InformationLibrary.StudentLibrary.Sort(new Student.StudentCompare(TeachingRange));
-                InformationLibrary.StudentLibrary.Sort((x, y) => x[this.TeachingRange] < y[this.TeachingRange] ? 1 : -1);
+                UserRepository.StudentLibrary.Sort((x, y) => x[this.TeachingRange] < y[this.TeachingRange] ? 1 : -1);
             }
-            UInt32 row = 1;
-            foreach (Student index in InformationLibrary.StudentLibrary)
+            uint row = 1;
+            foreach (Student index in UserRepository.StudentLibrary)
             {
                 if (row % 2 == 1)
                 {
@@ -114,7 +114,7 @@ namespace Sebastien.ClassManager.Core
                 }
 
                 WriteLine($"{"Name",-10}Score");
-                Parallel.ForEach(InformationLibrary.StudentLibrary.Where(stu => stu[this.TeachingRange] >= score), student =>
+                Parallel.ForEach(UserRepository.StudentLibrary.Where(stu => stu[this.TeachingRange] >= score), student =>
                 {
                     WriteLine($"{student.Name,-10}{student[this.TeachingRange],-10}");
                 });

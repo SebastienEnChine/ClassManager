@@ -12,10 +12,11 @@ namespace DisplayInfo
             BackgroundColor = ConsoleColor.Black;
             ForegroundColor = ConsoleColor.Green;
             Beep();
-            foreach(var index in args)
+            foreach(string index in args)
             {
-                WriteLine(index);
+                Write($"{index} ");
             }
+            WriteLine();
             ForegroundColor = ConsoleColor.White;
             WriteLine("-----------------------------------------");
             WriteLine("按任意键关闭窗口");

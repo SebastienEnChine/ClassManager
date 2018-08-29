@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Users>
+  <User Type ="HeadTeacher">
+    <Account>headteacher#3442</Account>
+    <Password>1234</Password>
+    <CreateTime>2018/8/1</CreateTime>
+    <Name>Teacher He</Name>
+    <Sex>Female</Sex>
+    <Age>24</Age>
+    <Address>Null</Address>
+    <YearsOfProfessional>15</YearsOfProfessional>
+  </User>
+  <User Type ="Student">
+    <Account>Haya#4387</Account>
+    <Password>1234</Password>
+    <CreateTime>2018/8/1</CreateTime>
+    <Name>Haya</Name>
+    <Sex>Female</Sex>
+    <Age>24</Age>
+    <Address>Null</Address>
+    <Scores>
+      <Score>90</Score>
+      <Score>34</Score>
+      <Score>24</Score>
+      <Score>89</Score>
+      <Score>87</Score>
+      <Score>56</Score>
+    </Scores>
+  </User>
+</Users>

@@ -44,9 +44,9 @@ namespace Sebastien.ClassManager.Core
         /// 检查是否已经启动了此程序
         /// </summary>
         /// <returns>如果已经启动了此程序则为<see>true</see>, 否则为<see>false</see></returns>
-        private static Boolean IsStarted()
+        private static bool IsStarted()
         {
-            var mutex = new Mutex(false, "ClassManagerLock", out var Started);
+            var mutex = new Mutex(false, "ClassManagerLock", out bool Started);
             return Started;
         }
         /// <summary>
@@ -188,7 +188,7 @@ namespace Sebastien.ClassManager.Core
         {
             stu.TheTipsOfNews();
             ForegroundColor = ConsoleColor.Yellow;
-            var input = ReadLine();
+            string input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -234,10 +234,10 @@ namespace Sebastien.ClassManager.Core
                     stu.DisplayTeacherList();
                     break;
                 case Command.SubscriptionToHeadTeacher:
-                    stu.SubscriptionToHeadTeacher(InformationLibrary.HeadTeacherUser);
+                    stu.SubscriptionToHeadTeacher(UserRepository.HeadTeacherUser);
                     break;
                 case Command.UnsubscribeToHeadTeacher:
-                    stu.UnsubscribeToHeadTeacher(InformationLibrary.HeadTeacherUser);
+                    stu.UnsubscribeToHeadTeacher(UserRepository.HeadTeacherUser);
                     break;
                 default:
                     Ui.DisplayTheInformationOfErrorCode(ErrorCode.NotACommand, input);
@@ -253,7 +253,7 @@ namespace Sebastien.ClassManager.Core
         private static UserCore RunForTeacher(Instructor teacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
-            var input = ReadLine();
+            string input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -318,7 +318,7 @@ namespace Sebastien.ClassManager.Core
         private static UserCore RunForHeadTeacher(HeadTeacher headTeacher)
         {
             ForegroundColor = ConsoleColor.Yellow;
-            var input = ReadLine();
+            string input = ReadLine();
             ForegroundColor = ConsoleColor.Blue;
             if (string.IsNullOrWhiteSpace(input))
             {
@@ -401,17 +401,17 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 此方法依赖User.cs文件中的FindAccount <T> 类, 推荐使用基于本地函数实现的新版本")]
         public static UserCore CheckAccountAvailabilityOldVersionAndNeedOtherClass(string account) //依赖于User.cs文件中的FindAccount <T> 类
         {
-            var index1 = InformationLibrary.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
+            int index1 = UserRepository.StudentLibrary.FindIndex(new FindAccount<Student>(account).FindAccountPredicate);
             if (index1 != -1)
             {
-                return InformationLibrary.StudentLibrary[index1];
+                return UserRepository.StudentLibrary[index1];
             }
-            var index2 = InformationLibrary.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
+            int index2 = UserRepository.TeacherLibrary.FindIndex(new FindAccount<Teacher>(account).FindAccountPredicate);
             if (index2 != -1)
             {
-                return InformationLibrary.StudentLibrary[index2];
+                return UserRepository.StudentLibrary[index2];
             }
-            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+            return account == UserRepository.HeadTeacherUser.Account ? UserRepository.HeadTeacherUser : null;
         }
         /// <summary>
         /// 检查账户是否存在(旧版本)
@@ -421,17 +421,17 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 此方法使用Lambda表达式, 但同一表达式使用多次")]
         public static UserCore CheckAccountAvailabilityOldVersionLambda(string account)
         {
-            var index1 = InformationLibrary.StudentLibrary.FindIndex(u => u.Account == account);
+            int index1 = UserRepository.StudentLibrary.FindIndex(u => u.Account == account);
             if (index1 != -1)
             {
-                return InformationLibrary.StudentLibrary[index1];
+                return UserRepository.StudentLibrary[index1];
             }
-            var index2 = InformationLibrary.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
+            int index2 = UserRepository.TeacherLibrary.FindIndex(u => u.Account.Equals(account));
             if (index2 != -1)
             {
-                return InformationLibrary.StudentLibrary[index2];
+                return UserRepository.StudentLibrary[index2];
             }
-            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+            return account == UserRepository.HeadTeacherUser.Account ? UserRepository.HeadTeacherUser : null;
         }
         /// <summary>
         /// 检查账户是否存在(旧版本)
@@ -441,21 +441,21 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 使用传统for循环的旧版本")]
         public static UserCore CheckAccountAvailabilityOldVersionNormal(string account)
         {
-            foreach (Student index in InformationLibrary.StudentLibrary)
+            foreach (Student index in UserRepository.StudentLibrary)
             {
                 if (account.Equals(index.Account))
                 {
                     return index;
                 }
             }
-            foreach (Instructor index in InformationLibrary.TeacherLibrary)
+            foreach (Instructor index in UserRepository.TeacherLibrary)
             {
                 if (account.Equals(index.Account))
                 {
                     return index;
                 }
             }
-            return account == InformationLibrary.HeadTeacherUser.Account ? InformationLibrary.HeadTeacherUser : null;
+            return account == UserRepository.HeadTeacherUser.Account ? UserRepository.HeadTeacherUser : null;
         }
         /// <summary>
         /// 检查账户是否存在
@@ -464,21 +464,21 @@ namespace Sebastien.ClassManager.Core
         /// <returns>true: 不存在， false: 已存在</returns>
         public static UserCore CheckAccountAvailability(string account)
         {
-            Student student = InformationLibrary.StudentLibrary.Find(IsEquals);
+            Student student = UserRepository.StudentLibrary.Find(IsEquals);
             if (student != default(Student))
             {
                 return student;
             }
-            Instructor instructor = InformationLibrary.TeacherLibrary.Find(IsEquals);
+            Instructor instructor = UserRepository.TeacherLibrary.Find(IsEquals);
             if (instructor != default(Instructor))
             {
                 return instructor;
             }
 
-            return (IsEquals(InformationLibrary.HeadTeacherUser)) ? InformationLibrary.HeadTeacherUser : null;
+            return (IsEquals(UserRepository.HeadTeacherUser)) ? UserRepository.HeadTeacherUser : null;
 
             //Local Function For The Find() Method 
-            Boolean IsEquals(UserCore u) => u.Account.Equals(account);
+            bool IsEquals(UserCore u) => u.Account.Equals(account);
         }
         /// <summary>
         /// 检查登录信息
@@ -504,10 +504,10 @@ namespace Sebastien.ClassManager.Core
         /// 检查能否发布新课表
         /// </summary>
         /// <returns></returns>
-        public static Boolean CanAddNewCurriculum()
+        public static bool CanAddNewCurriculum()
         {
             UpdateCurriculum();
-            return InformationLibrary._curriculums[1] == null;
+            return UserRepository._curriculums[1] == null;
         }
         /// <summary>
         /// 检查已失效的课表并删除(没有使用" ?. "条件运算符的旧方法)
@@ -515,24 +515,24 @@ namespace Sebastien.ClassManager.Core
         [Obsolete("方法已过期, 此方法没有使用 ?. 运算符,  代码过于冗长, 请使用此方法的新版本")]
         public static void UpdateCurriculumOldVersion()
         {
-            if (InformationLibrary._curriculums[0] != null)
+            if (UserRepository._curriculums[0] != null)
             {
-                if (InformationLibrary._curriculums[1] != null)
+                if (UserRepository._curriculums[1] != null)
                 {
-                    if (DateTime.Now > InformationLibrary._curriculums[0].OverTime)
+                    if (DateTime.Now > UserRepository._curriculums[0].OverTime)
                     {
-                        if (DateTime.Now > InformationLibrary._curriculums[1].OverTime)
+                        if (DateTime.Now > UserRepository._curriculums[1].OverTime)
                         {
-                            InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1] = null;
+                            UserRepository._curriculums[0] = UserRepository._curriculums[1] = null;
                         }
-                        InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1];
-                        InformationLibrary._curriculums[1] = null;
+                        UserRepository._curriculums[0] = UserRepository._curriculums[1];
+                        UserRepository._curriculums[1] = null;
                     }
                 }
                 else
                 {
-                    if (DateTime.Now <= InformationLibrary._curriculums[0].OverTime) return;
-                    InformationLibrary._curriculums[0] = null;
+                    if (DateTime.Now <= UserRepository._curriculums[0].OverTime) return;
+                    UserRepository._curriculums[0] = null;
                 }
             }
         }
@@ -542,16 +542,16 @@ namespace Sebastien.ClassManager.Core
         public static void UpdateCurriculum()
         {
             //<!>DateTime结构体变量于null比较始终为false</!>
-            if (DateTime.Now > InformationLibrary._curriculums[0]?.OverTime)
+            if (DateTime.Now > UserRepository._curriculums[0]?.OverTime)
             {
-                if (DateTime.Now > InformationLibrary._curriculums[1]?.OverTime)
+                if (DateTime.Now > UserRepository._curriculums[1]?.OverTime)
                 {
-                    InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1] = null;
+                    UserRepository._curriculums[0] = UserRepository._curriculums[1] = null;
                 }
                 else
                 {
-                    InformationLibrary._curriculums[0] = InformationLibrary._curriculums[1];
-                    InformationLibrary._curriculums[1] = null;
+                    UserRepository._curriculums[0] = UserRepository._curriculums[1];
+                    UserRepository._curriculums[1] = null;
                 }
             }
         }

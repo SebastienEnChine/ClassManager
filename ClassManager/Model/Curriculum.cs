@@ -86,7 +86,7 @@ namespace Sebastien.ClassManager.Core
         public Curriculum()
         {
             DateTime temp = DateTime.Now.AddDays(DateTime.Now.DayOfWeek == DayOfWeek.Sunday ? 0 : 7 - (int)DateTime.Now.DayOfWeek);
-            if (InformationLibrary._curriculums[0] != null)
+            if (UserRepository._curriculums[0] != null)
             {
                 temp = temp.AddDays(7);
             }
@@ -101,23 +101,23 @@ namespace Sebastien.ClassManager.Core
         {
             Ui.PrintColorMsg($"{"",-6}{"Mon",-15}{"Tue",-15}{"Wen",-15}{"Thu",-15}{"Fri",-15}{"Sat",-15}{"Sun",-15}", ConsoleColor.White, ConsoleColor.Black);
             WriteLine(".");
-            for (var row = 0; row < this.Classes; ++row)
+            for (int row = 0; row < this.Classes; ++row)
             {
                 Ui.PrintColorMsg(row == 0 ? "上午" : (row == 1 ? "下午" : "晚上"), ConsoleColor.White, ConsoleColor.Black);
                 Ui.PrintColorMsg($"{" ",-2}", ConsoleColor.White, ConsoleColor.Black);
-                for (var line = 0; line < this.Week; ++line)
+                for (int line = 0; line < this.Week; ++line)
                 {
                     PrintMsg(this._lessons[line, row].Person, this._lessons[line, row].CurriculumColor);
                 }
                 WriteLine(".");
                 Ui.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
-                for (var line = 0; line < this.Week; ++line)
+                for (int line = 0; line < this.Week; ++line)
                 {
                     PrintMsg(this._lessons[line, row].Theme, this._lessons[line, row].CurriculumColor);
                 }
                 WriteLine(".");
                 Ui.PrintColorMsg($"{"",-6}", ConsoleColor.White, ConsoleColor.Black);
-                for (var line = 0; line < this.Week; ++line)
+                for (int line = 0; line < this.Week; ++line)
                 {
                     PrintMsg(this._lessons[line, row].CurriculumColor.ToString(), this._lessons[line, row].CurriculumColor);
                 }

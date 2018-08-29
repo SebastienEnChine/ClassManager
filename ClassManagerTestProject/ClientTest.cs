@@ -52,7 +52,9 @@ namespace Sebastien.ClassManager.TestProject
             //arrange
             var account = "headteacher";
             //act
-            UserCore result = Client.CheckAccountAvailability(account);
+            //Todo:
+            var repository = new UserRepository();
+            UserCore result = repository.GetUser(account);
             //assert
             Assert.AreNotEqual(result, null);
         }

@@ -20,13 +20,13 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 成绩
         /// </summary>
-        private readonly Double?[] _score = new Double?[Subject.C.GetLengthOfSubject()];
+        private readonly double?[] _score = new double?[Subject.C.GetLengthOfSubject()];
         /// <summary>
         /// 成绩索引器
         /// </summary>
         /// <param name="index">科目索引</param>
         /// <returns>成绩</returns> 
-        public Double? this[Subject index]
+        public double? this[Subject index]
         {
             get
             {
@@ -48,7 +48,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 是否有新消息
         /// </summary>
-        public Boolean HasNewMsg => this.NewMsg.Count > 0;
+        public bool HasNewMsg => this.NewMsg.Count > 0;
         /// <summary>
         /// 新消息
         /// </summary>
@@ -60,7 +60,7 @@ namespace Sebastien.ClassManager.Core
         /// <summary>
         /// 订阅状态
         /// </summary>
-        private Boolean IsSubscription { get; set; }
+        private bool IsSubscription { get; set; }
 
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace Sebastien.ClassManager.Core
         public Student(Student stu) : base(stu)
         {
             //TODO:
-            for (var index = 0; index < this._score.Length; ++index)
+            for (int index = 0; index < this._score.Length; ++index)
             {
                 this._score[index] = stu[(Subject)index];
             }
@@ -164,10 +164,10 @@ namespace Sebastien.ClassManager.Core
         /// 获取总成绩
         /// </summary>
         /// <returns>总成绩</returns>
-        public Double GetTotalScore()
+        public double GetTotalScore()
         {
-            var sum = default(Double);
-            foreach (var index in this._score)
+            double sum = default;
+            foreach (double? index in this._score)
             {
                 sum += index ?? 0;
             }
@@ -178,7 +178,7 @@ namespace Sebastien.ClassManager.Core
         /// </summary>
         public void ShowMyScore()
         {
-            foreach (Double? index in this)
+            foreach (double? index in this)
             {
                 Write($"{(index == null ? "Not Set" : index.ToString()),-10}");
             }
@@ -199,7 +199,7 @@ namespace Sebastien.ClassManager.Core
         {
             if (this.HasNewMsg)
             {
-                for (var index = 0; index < this.NewMsg.Count; ++index)
+                for (int index = 0; index < this.NewMsg.Count; ++index)
                 {
                     Message msg = this.NewMsg.Dequeue();
                     Ui.PrintColorMsg(msg.ToString(), ConsoleColor.Black, ConsoleColor.DarkMagenta);
@@ -232,7 +232,7 @@ namespace Sebastien.ClassManager.Core
         public string ToString(string format, IFormatProvider formatProvider)
         {
             var score = new StringBuilder();
-            foreach (var index in this._score)
+            foreach (double? index in this._score)
             {
                 score.Append($"{index,-10}");
             }
@@ -266,7 +266,7 @@ namespace Sebastien.ClassManager.Core
         /// <param name="sender"></param>
         /// <param name="e"></param>
         /// <returns></returns>
-        public Boolean ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
+        public bool ReceiveWeakEvent(Type managerType, object sender, EventArgs e)
         {
             ReceiveNewCurriculum(sender, e as Message);
             return true;
@@ -280,7 +280,7 @@ namespace Sebastien.ClassManager.Core
             /// <summary>
             /// 枚举目标
             /// </summary>
-            private Double?[] _iscore { get; set; }
+            private double?[] _iscore { get; set; }
             /// <summary>
             /// 当前索引
             /// </summary>
@@ -289,7 +289,7 @@ namespace Sebastien.ClassManager.Core
             /// 构造函数
             /// </summary>
             /// <param name="score"></param>
-            public StudentIEnumerator(Double?[] score)
+            public StudentIEnumerator(double?[] score)
             {
                 this._iscore = score;
                 this._position = -1;
@@ -303,7 +303,7 @@ namespace Sebastien.ClassManager.Core
             /// 移动到下一元素
             /// </summary>
             /// <returns></returns>
-            public Boolean MoveNext() => (++this._position < this._iscore.Length);
+            public bool MoveNext() => (++this._position < this._iscore.Length);
             /// <inheritdoc />
             /// <summary>
             /// 重置当前元素

@@ -141,7 +141,7 @@ namespace MySelector
         /// </summary>
         private void DisplayTheInfomationOfSelect()
         {
-            for (var index = 0; index < this.TheInfomationOfSelect.Count; ++index)
+            for (int index = 0; index < this.TheInfomationOfSelect.Count; ++index)
             {
                 if (this._mainIndex == index)
                 {
